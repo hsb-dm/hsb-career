@@ -1,0 +1,27 @@
+/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
+:root {
+  --color-black: #080909;
+  --color-deep: #050909;
+  --color-dark: #0a1313;
+  --color-card: #1c1e1d;
+  --color-card-alt: #202323;
+  --color-line: #353936;
+  --color-white: #f7f8f4;
+  --color-muted: #aeb4ae;
+  --color-subtle: #737a75;
+  --color-accent: #d8ff27;
+  --color-accent-ink: #080909;
+  --color-accent-soft: #b9d924;
+  --color-header-divider: #777a78;
+  --color-awards: #d5f948;
+  --color-footer-bg: #070908;
+  --color-footer-title: #a3a4a7;
+  --color-footer-text: #f7f7f4;
+  --color-footer-rule: #ffffff2e;
+  --font-display: 'Juturu', 'StolzlMedium', Arial, sans-serif;
+  --font-body: 'StolzlRegular', 'Stolzl', Arial, sans-serif;
+  --font-book: 'StolzlBook', 'StolzlRegular', Arial, sans-serif;
+  --font-medium: 'StolzlMedium', 'Stolzl', Arial, sans-serif;
+  --radius-card: 18px;
+  --radius-pill: 999px;
+}

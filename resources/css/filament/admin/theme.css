@@ -1,0 +1,100 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+:root {
+    --font-family: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.fi-body {
+    background:
+        linear-gradient(180deg, rgb(248 250 252) 0%, rgb(241 245 249) 100%);
+}
+
+.fi-logo {
+    color: rgb(15 23 42);
+    font-weight: 700;
+}
+
+.fi-sidebar,
+.fi-topbar {
+    background-color: rgb(255 255 255 / 0.92);
+    border-color: rgb(226 232 240);
+    backdrop-filter: blur(16px);
+}
+
+.fi-sidebar-nav {
+    gap: 0.25rem;
+    padding-inline: 0.75rem;
+}
+
+.fi-sidebar-item-button {
+    border-radius: 0.625rem;
+}
+
+.fi-sidebar-item-active > .fi-sidebar-item-button {
+    background-color: rgb(227 238 255);
+    color: rgb(27 57 230);
+}
+
+.fi-section,
+.fi-ta,
+.fi-fo-field-wrp,
+.fi-wi-stats-overview-stat {
+    border-color: rgb(226 232 240);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+.fi-section {
+    border-radius: 0.875rem;
+}
+
+.fi-section-header {
+    background-color: rgb(248 250 252);
+}
+
+.fi-ta-header,
+.fi-ta-content,
+.fi-ta-table {
+    background-color: rgb(255 255 255);
+}
+
+.fi-ta-row:hover {
+    background-color: rgb(248 250 252);
+}
+
+.fi-btn {
+    border-radius: 0.625rem;
+    font-weight: 600;
+}
+
+.fi-btn-color-primary {
+    background-color: rgb(15 32 128);
+    border-color: rgb(15 32 128);
+    color: rgb(255 255 255);
+    box-shadow: 0 8px 18px rgb(15 32 128 / 0.22);
+}
+
+.fi-btn-color-primary:hover {
+    background-color: rgb(11 24 95);
+    border-color: rgb(11 24 95);
+}
+
+.fi-btn-color-primary:focus-visible {
+    outline: 3px solid rgb(27 57 230 / 0.24);
+    outline-offset: 2px;
+}
+
+.fi-badge {
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.fi-ta-cell {
+    vertical-align: middle;
+}
+
+.dark .fi-body {
+    background: rgb(2 6 23);
+}

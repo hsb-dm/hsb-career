@@ -1,0 +1,24 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: hsb-jobs-mysql
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-hsb_jobs}"
+      MYSQL_USER: "${DB_USERNAME:-hsb_jobs}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-root}"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-u", "$${MYSQL_USER}", "--password=$${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  mysql-data:
+    driver: local
