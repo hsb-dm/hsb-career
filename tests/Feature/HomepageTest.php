@@ -3,6 +3,7 @@
 use App\Enums\JobStatus;
 use App\Models\Job;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -38,4 +39,20 @@ test('homepage shows at most five jobs and only offers all vacancies when there 
 
     $response = $this->get('/')->assertOk()->assertSee('View all opportunities');
     expect(substr_count($response->getContent(), 'class="job-card"'))->toBe(5);
+});
+
+test('homepage loads listing data in one small jobs query', function () {
+    Job::factory()->count(6)->create(['status' => JobStatus::Active]);
+
+    $jobQueries = [];
+    DB::listen(function ($query) use (&$jobQueries): void {
+        if (str_contains(strtolower($query->sql), ' from "jobs"')) {
+            $jobQueries[] = strtolower($query->sql);
+        }
+    });
+
+    $this->get('/')->assertOk();
+
+    expect($jobQueries)->toHaveCount(1)
+        ->and($jobQueries[0])->not->toContain('description');
 });

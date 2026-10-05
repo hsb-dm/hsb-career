@@ -5,11 +5,15 @@ use App\Enums\JobStatus;
 use App\Enums\WorkArrangement;
 use App\Filament\Resources\Applicants\ApplicantResource;
 use App\Filament\Resources\Jobs\Pages\CreateJob;
+use App\Filament\Widgets\RecruitmentStatsOverview;
 use App\Models\Applicant;
 use App\Models\Job;
 use App\Models\User;
 use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -26,6 +30,27 @@ test('admin can open dashboard', function () {
         ->get('/admin')
         ->assertOk()
         ->assertSee('Dashboard');
+});
+
+test('dashboard calculates applicant summary with one aggregate query', function () {
+    Applicant::factory()->create(['status' => 'new']);
+    Applicant::factory()->create(['status' => 'interview']);
+    Applicant::factory()->create(['status' => 'accepted']);
+
+    $summaryQueries = [];
+    DB::listen(function ($query) use (&$summaryQueries): void {
+        if (str_contains(strtolower($query->sql), 'sum(case when status')) {
+            $summaryQueries[] = $query->sql;
+        }
+    });
+
+    $this->actingAs(User::factory()->create());
+
+    livewire(RecruitmentStatsOverview::class)
+        ->assertSee('Total applicants')
+        ->assertSee('Applicants in interview');
+
+    expect($summaryQueries)->toHaveCount(1);
 });
 
 test('admin can view jobs list', function () {
@@ -74,6 +99,30 @@ test('admin can view applicants list', function () {
         ->get('/admin/applicants')
         ->assertOk()
         ->assertSee('Ari Candidate');
+});
+
+test('applicants list eager loads jobs as the number of applicants grows', function () {
+    foreach (range(1, 6) as $number) {
+        Applicant::factory()->create([
+            'job_id' => Job::factory()->create(['title' => "Job {$number}"])->id,
+            'name' => "Candidate {$number}",
+        ]);
+    }
+
+    $jobQueries = [];
+    DB::listen(function ($query) use (&$jobQueries): void {
+        if (str_contains(strtolower($query->sql), ' from "jobs"')) {
+            $jobQueries[] = $query->sql;
+        }
+    });
+
+    $this->actingAs(User::factory()->create())
+        ->get('/admin/applicants')
+        ->assertOk()
+        ->assertSee('Candidate 1')
+        ->assertSee('Candidate 6');
+
+    expect(count($jobQueries))->toBeLessThanOrEqual(3);
 });
 
 test('admin cannot open applicant create page', function () {
@@ -135,4 +184,16 @@ test('missing dummy cv path does not break applicant detail page', function () {
         ->get(ApplicantResource::getUrl('view', ['record' => $applicant]))
         ->assertOk()
         ->assertSee('File not found');
+});
+
+test('applicant CV preview remains private and serves PDF files', function () {
+    Storage::fake('local');
+    $path = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf')->store('cvs', 'local');
+    $applicant = Applicant::factory()->create(['cv_path' => $path]);
+
+    $this->get(route('admin.applicants.cv.preview', $applicant))->assertRedirect('/login');
+    $this->actingAs(User::factory()->create())
+        ->get(route('admin.applicants.cv.preview', $applicant))
+        ->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf');
 });

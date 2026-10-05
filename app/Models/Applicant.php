@@ -14,11 +14,11 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $job_id
  * @property string $name
- * @property string $email
- * @property string $phone
+ * @property string|null $email
+ * @property string|null $phone
  * @property int|null $current_salary
- * @property int $expected_salary
- * @property string $notice_period
+ * @property int|null $expected_salary
+ * @property string|null $notice_period
  * @property string|null $cv_path
  * @property ApplicantStatus $status
  * @property string|null $hr_note
@@ -71,7 +71,7 @@ class Applicant extends Model
 
     public function salaryIncrease(): ?int
     {
-        if ($this->current_salary === null) {
+        if ($this->current_salary === null || $this->expected_salary === null) {
             return null;
         }
 
@@ -80,7 +80,7 @@ class Applicant extends Model
 
     public function salaryIncreasePercentage(): ?float
     {
-        if ($this->current_salary === null || $this->current_salary <= 0) {
+        if ($this->current_salary === null || $this->current_salary <= 0 || $this->expected_salary === null) {
             return null;
         }
 

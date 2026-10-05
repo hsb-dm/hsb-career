@@ -44,7 +44,6 @@ class ApplicantForm
                             ->label('Job')
                             ->relationship('job', 'title')
                             ->searchable()
-                            ->preload()
                             ->required(),
                         Select::make('status')
                             ->options(ApplicantStatus::options())

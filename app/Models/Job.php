@@ -7,6 +7,7 @@ use App\Enums\JobStatus;
 use App\Enums\WorkArrangement;
 use Database\Factories\JobFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -44,6 +45,14 @@ class Job extends Model
 {
     /** @use HasFactory<JobFactory> */
     use HasFactory;
+
+    /** @param Builder<Job> $query
+     * @return Builder<Job>
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('status', JobStatus::Active);
+    }
 
     protected static function booted(): void
     {

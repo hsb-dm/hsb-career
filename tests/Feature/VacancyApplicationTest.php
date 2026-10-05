@@ -82,6 +82,25 @@ test('application validates required answers and other choices', function () {
     expect(Applicant::query()->count())->toBe(0);
 });
 
+test('other answers are saved and salary calculations stay empty for free text amounts', function () {
+    $job = Job::factory()->create(['status' => JobStatus::Active]);
+
+    $this->post(route('vacancies.apply.store', $job->slug), [
+        ...applicationAnswers(),
+        'current_domicile' => 'Other',
+        'current_domicile_other' => 'Bandung',
+        'serious_disease' => 'yes',
+        'serious_disease_details' => 'A past diagnosis.',
+    ])->assertSessionHasNoErrors();
+
+    $applicant = Applicant::query()->sole();
+    expect($applicant->current_domicile)->toBe('Bandung')
+        ->and($applicant->serious_disease)->toBeTrue()
+        ->and($applicant->serious_disease_details)->toBe('A past diagnosis.')
+        ->and($applicant->salaryIncrease())->toBeNull()
+        ->and($applicant->salaryIncreasePercentage())->toBeNull();
+});
+
 test('inactive and unknown vacancies cannot receive applications', function () {
     $job = Job::factory()->create(['status' => JobStatus::Inactive]);
 

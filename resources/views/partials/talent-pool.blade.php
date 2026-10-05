@@ -42,7 +42,7 @@
                     <div class="talent-options" id="talent-interest-options" role="listbox" aria-label="Area of interest" hidden>
                         <button type="button" role="option" aria-selected="{{ old('area_of_interest') ? 'false' : 'true' }}"
                             data-value="">Area of interest</button>
-                        @foreach (['Technology', 'Digital Marketing', 'Operations', 'Finance', 'Business Development', 'Human Resources', 'Compliance'] as $interest)
+                        @foreach (\App\Models\TalentPoolEntry::AREAS_OF_INTEREST as $interest)
                             <button type="button" role="option" aria-selected="{{ old('area_of_interest') === $interest ? 'true' : 'false' }}"
                                 data-value="{{ $interest }}">{{ $interest }}</button>
                         @endforeach

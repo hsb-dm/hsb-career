@@ -1,5 +1,3 @@
-import Swiper from 'swiper';
-import { A11y, Autoplay, Keyboard, Navigation, Pagination } from 'swiper/modules';
 import 'swiper/css';
 
 const search = document.querySelector('#job-search');
@@ -33,49 +31,49 @@ function filterJobs() {
 
 search?.addEventListener('input', filterJobs);
 if (isVacanciesPage) filterJobs();
-const jobSelect = document.querySelector('[data-job-select]');
-if (jobSelect) {
-    const trigger = jobSelect.querySelector('.talent-select-trigger');
-    const options = jobSelect.querySelector('.talent-options');
-    const label = jobSelect.querySelector('[data-job-selection]');
+function setupListbox(root, value, label, onChange = () => {}) {
+    if (!root) return null;
+
+    const trigger = root.querySelector('.talent-select-trigger');
+    const options = root.querySelector('.talent-options');
     const choices = [...options.querySelectorAll('[role="option"]')];
 
-    function closeJobOptions(focusTrigger = false) {
+    function close(focusTrigger = false) {
         options.hidden = true;
         trigger.setAttribute('aria-expanded', 'false');
         if (focusTrigger) trigger.focus();
     }
 
-    function openJobOptions() {
+    function open() {
         options.hidden = false;
         trigger.setAttribute('aria-expanded', 'true');
-        choices.find((choice) => choice.dataset.value === typeFilter.value)?.focus();
+        choices.find((choice) => choice.dataset.value === value.value)?.focus();
     }
 
     trigger.addEventListener('click', () => {
-        if (options.hidden) openJobOptions();
-        else closeJobOptions();
+        if (options.hidden) open();
+        else close();
     });
 
     trigger.addEventListener('keydown', (event) => {
         if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();
-            openJobOptions();
-            choices[event.key === 'ArrowDown' ? 0 : choices.length - 1].focus();
+            open();
+            choices[event.key === 'ArrowDown' ? 0 : choices.length - 1]?.focus();
         }
     });
 
     choices.forEach((choice, index) => {
         choice.addEventListener('click', () => {
-            typeFilter.value = choice.dataset.value;
+            value.value = choice.dataset.value;
             label.textContent = choice.textContent;
             choices.forEach((item) => item.setAttribute('aria-selected', String(item === choice)));
-            closeJobOptions(true);
-            filterJobs();
+            close(true);
+            onChange();
         });
 
         choice.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') closeJobOptions(true);
+            if (event.key === 'Escape') close(true);
             if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
                 event.preventDefault();
                 choices[(index + (event.key === 'ArrowDown' ? 1 : -1) + choices.length) % choices.length].focus();
@@ -84,12 +82,26 @@ if (jobSelect) {
     });
 
     document.addEventListener('click', (event) => {
-        if (!jobSelect.contains(event.target)) closeJobOptions();
+        if (!root.contains(event.target)) close();
     });
+
+    return { trigger, open };
 }
 
+setupListbox(
+    document.querySelector('[data-job-select]'),
+    typeFilter,
+    document.querySelector('[data-job-selection]'),
+    filterJobs,
+);
+
 const gallery = document.querySelector('[data-gallery]');
-if (gallery) {
+async function initGallery(gallery) {
+    const [{ default: Swiper }, { A11y, Autoplay, Keyboard, Navigation, Pagination }] = await Promise.all([
+        import('swiper'),
+        import('swiper/modules'),
+    ]);
+
     new Swiper(gallery, {
         modules: [A11y, Autoplay, Keyboard, Navigation, Pagination],
         initialSlide: 1,
@@ -124,65 +136,18 @@ if (gallery) {
     });
 }
 
+if (gallery) initGallery(gallery);
+
 const talentSelect = document.querySelector('[data-talent-select]');
 if (talentSelect) {
-    const trigger = talentSelect.querySelector('.talent-select-trigger');
-    const options = talentSelect.querySelector('.talent-options');
     const value = talentSelect.querySelector('input[name="area_of_interest"]');
-    const label = talentSelect.querySelector('[data-talent-selection]');
-    const choices = [...options.querySelectorAll('[role="option"]')];
-
-    function closeTalentOptions(focusTrigger = false) {
-        options.hidden = true;
-        trigger.setAttribute('aria-expanded', 'false');
-        if (focusTrigger) trigger.focus();
-    }
-
-    function openTalentOptions() {
-        options.hidden = false;
-        trigger.setAttribute('aria-expanded', 'true');
-        choices.find((choice) => choice.dataset.value === value.value)?.focus();
-    }
-
-    trigger.addEventListener('click', () => {
-        if (options.hidden) openTalentOptions();
-        else closeTalentOptions();
-    });
-
-    trigger.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-            event.preventDefault();
-            openTalentOptions();
-            choices[event.key === 'ArrowDown' ? 0 : choices.length - 1].focus();
-        }
-    });
-
-    choices.forEach((choice, index) => {
-        choice.addEventListener('click', () => {
-            value.value = choice.dataset.value;
-            label.textContent = choice.textContent;
-            choices.forEach((item) => item.setAttribute('aria-selected', String(item === choice)));
-            closeTalentOptions(true);
-        });
-
-        choice.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') closeTalentOptions(true);
-            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-                event.preventDefault();
-                choices[(index + (event.key === 'ArrowDown' ? 1 : -1) + choices.length) % choices.length].focus();
-            }
-        });
-    });
-
-    document.addEventListener('click', (event) => {
-        if (!talentSelect.contains(event.target)) closeTalentOptions();
-    });
+    const listbox = setupListbox(talentSelect, value, talentSelect.querySelector('[data-talent-selection]'));
 
     document.querySelector('.talent-form')?.addEventListener('submit', (event) => {
         if (!value.value) {
             event.preventDefault();
-            trigger.focus();
-            openTalentOptions();
+            listbox.trigger.focus();
+            listbox.open();
         }
     });
 }
@@ -192,6 +157,27 @@ talentFile?.addEventListener('change', () => {
     const fileName = document.querySelector('[data-talent-file-name]');
     if (fileName) fileName.textContent = talentFile.files?.[0]?.name || 'Upload CV';
 });
+
+const applicationForm = document.querySelector('.application-form');
+if (applicationForm) {
+    for (const otherField of applicationForm.querySelectorAll('[data-other-for]')) {
+        const select = applicationForm.elements.namedItem(otherField.dataset.otherFor);
+        const input = otherField.querySelector('input');
+        const sync = () => {
+            otherField.hidden = select.value !== 'Other';
+            input.required = !otherField.hidden;
+        };
+
+        select.addEventListener('change', sync);
+        sync();
+    }
+
+    const healthAnswer = applicationForm.elements.namedItem('serious_disease');
+    const healthDetails = applicationForm.elements.namedItem('serious_disease_details');
+    const syncHealth = () => { healthDetails.required = healthAnswer.value === 'yes'; };
+    healthAnswer.addEventListener('change', syncHealth);
+    syncHealth();
+}
 
 const vacancyDescription = document.querySelector('[data-vacancy-description]');
 const vacancyReadMore = document.querySelector('[data-vacancy-read-more]');

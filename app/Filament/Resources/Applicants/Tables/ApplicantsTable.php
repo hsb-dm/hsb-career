@@ -63,8 +63,7 @@ class ApplicantsTable
                 SelectFilter::make('job_id')
                     ->label('Job')
                     ->relationship('job', 'title')
-                    ->searchable()
-                    ->preload(),
+                    ->searchable(),
                 SelectFilter::make('status')
                     ->options(ApplicantStatus::options()),
                 Filter::make('applied_at')
@@ -91,7 +90,9 @@ class ApplicantsTable
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
-                            $records->each->update(['status' => $data['status']]);
+                            Applicant::query()
+                                ->whereKey($records->pluck('id'))
+                                ->update(['status' => $data['status']]);
 
                             Notification::make()
                                 ->title('Applicant statuses updated')

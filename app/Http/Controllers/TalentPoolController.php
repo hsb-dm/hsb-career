@@ -16,15 +16,7 @@ class TalentPoolController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:255'],
-            'area_of_interest' => ['required', Rule::in([
-                'Technology',
-                'Digital Marketing',
-                'Operations',
-                'Finance',
-                'Business Development',
-                'Human Resources',
-                'Compliance',
-            ])],
+            'area_of_interest' => ['required', Rule::in(TalentPoolEntry::AREAS_OF_INTEREST)],
             'cv' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
         ]);
 
