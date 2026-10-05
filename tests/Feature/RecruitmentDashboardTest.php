@@ -102,9 +102,27 @@ test('salary is stored as integer', function () {
 
 test('database seeder runs without errors', function () {
     $this->seed(DatabaseSeeder::class);
+    $this->seed(DatabaseSeeder::class);
 
-    expect(Job::query()->count())->toBeGreaterThanOrEqual(10)
-        ->and(Applicant::query()->count())->toBeGreaterThanOrEqual(100)
+    expect(Job::query()->count())->toBe(10)
+        ->and(Applicant::query()->count())->toBe(0)
+        ->and(Job::query()->orderByDesc('published_at')->pluck('title')->all())->toBe([
+            'Legal & Compliance Manager',
+            'IT Manager',
+            'Product Manager',
+            'Performance Marketing',
+            'CRM & Growth',
+            'Brand Marketing Specialist',
+            'SEO & Media Partnership',
+            'Brand Partnership',
+            'Trading Operation',
+            'Head Of FAT (Mandarin Speaker)',
+        ])
+        ->and(Job::query()->where('location', 'Jakarta')->count())->toBe(10)
+        ->and(Job::query()->where('employment_type', EmploymentType::FullTime)->count())->toBe(10)
+        ->and(Job::query()->where('status', JobStatus::Active)->count())->toBe(10)
+        ->and(Job::query()->where('title', 'Legal & Compliance Manager')->firstOrFail()->description)->toContain('Key Responsibilities')
+        ->and(Job::query()->where('title', 'Legal & Compliance Manager')->firstOrFail()->published_at->format('M d, Y'))->toBe('Sep 29, 2026')
         ->and(User::query()->where('email', 'admin@example.com')->exists())->toBeTrue();
 });
 

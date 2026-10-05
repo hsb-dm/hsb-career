@@ -39,6 +39,22 @@ use Illuminate\Support\Carbon;
     'status',
     'hr_note',
     'applied_at',
+    'current_age',
+    'marital_status',
+    'current_status',
+    'current_domicile',
+    'english_fluency',
+    'foreign_language_fluency',
+    'current_salary_answer',
+    'additional_benefits',
+    'expected_salary_answer',
+    'motivation',
+    'reason_for_leaving',
+    'latest_company_reference',
+    'second_latest_company_reference',
+    'third_latest_company_reference',
+    'serious_disease',
+    'serious_disease_details',
 ])]
 class Applicant extends Model
 {
@@ -81,6 +97,8 @@ class Applicant extends Model
             'expected_salary' => 'integer',
             'status' => ApplicantStatus::class,
             'applied_at' => 'datetime',
+            'current_age' => 'integer',
+            'serious_disease' => 'boolean',
         ];
     }
 }

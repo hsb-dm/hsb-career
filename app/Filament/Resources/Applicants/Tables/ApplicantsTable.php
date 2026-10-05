@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
+use App\Models\Applicant;
 use App\Support\Rupiah;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -39,12 +40,12 @@ class ApplicantsTable
                     ->toggleable(),
                 TextColumn::make('current_salary')
                     ->label('Current salary')
-                    ->formatStateUsing(fn (?int $state): string => Rupiah::format($state))
+                    ->state(fn (Applicant $record): string => $record->current_salary_answer ?? Rupiah::format($record->current_salary))
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('expected_salary')
                     ->label('Expected salary')
-                    ->formatStateUsing(fn (?int $state): string => Rupiah::format($state))
+                    ->state(fn (Applicant $record): string => $record->expected_salary_answer ?? Rupiah::format($record->expected_salary))
                     ->sortable(),
                 TextColumn::make('notice_period')
                     ->label('Notice period')

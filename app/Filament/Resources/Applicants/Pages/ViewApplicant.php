@@ -43,6 +43,7 @@ class ViewApplicant extends ViewRecord
                 ->label('Download CV')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('gray')
+                ->visible(fn (Applicant $record): bool => filled($record->cv_path))
                 ->action(function (Applicant $record) {
                     if (blank($record->cv_path) || ! Storage::disk('local')->exists($record->cv_path)) {
                         Notification::make()

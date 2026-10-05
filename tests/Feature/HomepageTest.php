@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('homepage shows active jobs and hides inactive jobs', function () {
-    Job::factory()->create([
+    $active = Job::factory()->create([
         'title' => 'Active Design Role',
         'status' => JobStatus::Active,
     ]);
@@ -21,5 +21,21 @@ test('homepage shows active jobs and hides inactive jobs', function () {
         ->assertOk()
         ->assertSee('BUILD YOUR')
         ->assertSee('Active Design Role')
+        ->assertSee(route('vacancies.show', $active->slug))
+        ->assertSee(route('vacancies.index'))
         ->assertDontSee('Inactive Finance Role');
+});
+
+test('homepage shows at most five jobs and only offers all vacancies when there are more', function () {
+    Job::factory()->count(5)->create(['status' => JobStatus::Active]);
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('class="job-card"', false)
+        ->assertDontSee('View all opportunities');
+
+    Job::factory()->create(['title' => 'Newest Role', 'status' => JobStatus::Active]);
+
+    $response = $this->get('/')->assertOk()->assertSee('View all opportunities');
+    expect(substr_count($response->getContent(), 'class="job-card"'))->toBe(5);
 });

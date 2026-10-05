@@ -23,6 +23,8 @@ class ApplicantInfolist
                         TextEntry::make('name'),
                         TextEntry::make('email'),
                         TextEntry::make('phone'),
+                        TextEntry::make('current_age')->label('Current Age')->placeholder('-'),
+                        TextEntry::make('marital_status')->label('Marital Status')->placeholder('-'),
                         TextEntry::make('applied_at')
                             ->label('Applied at')
                             ->dateTime('d M Y H:i'),
@@ -38,10 +40,10 @@ class ApplicantInfolist
                             ->color(fn (ApplicantStatus $state): string => $state->color()),
                         TextEntry::make('current_salary')
                             ->label('Current salary')
-                            ->formatStateUsing(fn (?int $state): string => Rupiah::format($state)),
+                            ->state(fn (Applicant $record): string => $record->current_salary_answer ?? Rupiah::format($record->current_salary)),
                         TextEntry::make('expected_salary')
                             ->label('Expected salary')
-                            ->formatStateUsing(fn (?int $state): string => Rupiah::format($state)),
+                            ->state(fn (Applicant $record): string => $record->expected_salary_answer ?? Rupiah::format($record->expected_salary)),
                         TextEntry::make('salary_increase')
                             ->label('Salary increase')
                             ->state(function (Applicant $record): string {
@@ -56,9 +58,27 @@ class ApplicantInfolist
                                 return Rupiah::format($increase).($percentage === null ? '' : ' ('.number_format($percentage, 1).'%)');
                             }),
                         TextEntry::make('notice_period')
-                            ->label('Notice period'),
+                            ->label('Join Notification'),
+                        TextEntry::make('current_status')->label('Current Status')->placeholder('-'),
+                        TextEntry::make('current_domicile')->label('Current Domicile')->placeholder('-'),
+                        TextEntry::make('english_fluency')->label('English Fluency')->placeholder('-'),
+                        TextEntry::make('foreign_language_fluency')->label('Foreign Language Fluency (Other than English)')->placeholder('-'),
+                        TextEntry::make('additional_benefits')->label('Additional Benefits')->placeholder('-'),
+                        TextEntry::make('motivation')->label('Motivation for Apply')->placeholder('-'),
+                        TextEntry::make('reason_for_leaving')->label('Reason of Leaving Last Company')->placeholder('-'),
                     ])
                     ->columns(2),
+                Section::make('Reference checks')
+                    ->schema([
+                        TextEntry::make('latest_company_reference')->label('Latest Company')->placeholder('-'),
+                        TextEntry::make('second_latest_company_reference')->label('2nd Latest Company')->placeholder('-'),
+                        TextEntry::make('third_latest_company_reference')->label('3rd Latest Company')->placeholder('-'),
+                    ]),
+                Section::make('Health')
+                    ->schema([
+                        TextEntry::make('serious_disease')->label('Diagnosed with serious disease')->formatStateUsing(fn (?bool $state): string => $state === null ? '-' : ($state ? 'Yes' : 'No')),
+                        TextEntry::make('serious_disease_details')->label('Illness / disease details')->placeholder('-'),
+                    ]),
                 Section::make('CV')
                     ->schema([
                         TextEntry::make('cv_path')
@@ -67,8 +87,8 @@ class ApplicantInfolist
                         TextEntry::make('cv_available')
                             ->label('Availability')
                             ->badge()
-                            ->state(fn (Applicant $record): string => filled($record->cv_path) && Storage::disk('local')->exists($record->cv_path) ? 'Available' : 'File not found')
-                            ->color(fn (string $state): string => $state === 'Available' ? 'success' : 'warning'),
+                            ->state(fn (Applicant $record): string => blank($record->cv_path) ? 'Not provided' : (Storage::disk('local')->exists($record->cv_path) ? 'Available' : 'File not found'))
+                            ->color(fn (string $state): string => $state === 'Available' ? 'success' : ($state === 'Not provided' ? 'gray' : 'warning')),
                         TextEntry::make('cv_preview')
                             ->label('Preview')
                             ->state(fn (Applicant $record): string => filled($record->cv_path) && Storage::disk('local')->exists($record->cv_path) && Str::endsWith(strtolower($record->cv_path), '.pdf') ? 'PDF preview available' : '-'),
