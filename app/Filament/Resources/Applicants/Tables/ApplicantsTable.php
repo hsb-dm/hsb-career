@@ -11,6 +11,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -50,10 +51,10 @@ class ApplicantsTable
                 TextColumn::make('notice_period')
                     ->label('Notice period')
                     ->toggleable(),
-                TextColumn::make('status')
-                    ->badge()
-                    ->formatStateUsing(fn (ApplicantStatus|string|null $state): ?string => $state instanceof ApplicantStatus ? $state->label() : $state)
-                    ->color(fn (ApplicantStatus|string|null $state): string => $state instanceof ApplicantStatus ? $state->color() : 'gray'),
+                SelectColumn::make('status')
+                    ->label('Status')
+                    ->options(ApplicantStatus::options())
+                    ->selectablePlaceholder(false),
                 TextColumn::make('applied_at')
                     ->label('Applied at')
                     ->dateTime('d M Y H:i')

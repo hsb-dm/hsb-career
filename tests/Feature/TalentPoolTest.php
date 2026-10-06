@@ -47,6 +47,21 @@ test('invalid talent pool submission returns to form without saving', function (
     expect(TalentPoolEntry::query()->count())->toBe(0);
 });
 
+test('talent pool rejects oversized CV with a clear message', function () {
+    Storage::fake('local');
+
+    $this->followingRedirects()->post(route('talent-pool.store'), [
+        'name' => 'Nadia Candidate',
+        'email' => 'nadia@example.com',
+        'area_of_interest' => 'Technology',
+        'cv' => UploadedFile::fake()->create('large.pdf', 6000, 'application/pdf'),
+    ])
+        ->assertSee('CV file must be no larger than 5 MB.')
+        ->assertSee('aria-describedby="talent-cv-client-error talent-cv-error"', false);
+
+    expect(TalentPoolEntry::query()->count())->toBe(0);
+});
+
 test('talent pool entries are visible in the admin menu and CV requires login', function () {
     Storage::fake('local');
     $path = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf')->store('talent-pool-cvs', 'local');

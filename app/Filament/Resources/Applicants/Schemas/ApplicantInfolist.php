@@ -93,14 +93,8 @@ class ApplicantInfolist
                             ->label('Preview')
                             ->state(fn (Applicant $record): string => filled($record->cv_path) && Storage::disk('local')->exists($record->cv_path) && Str::endsWith(strtolower($record->cv_path), '.pdf') ? 'PDF preview available' : '-'),
                     ])
-                    ->columns(3),
-                Section::make('Internal HR note')
-                    ->schema([
-                        TextEntry::make('hr_note')
-                            ->hiddenLabel()
-                            ->placeholder('-')
-                            ->prose(),
-                    ]),
+                    ->columns(3)
+                    ->visible(fn (Applicant $record): bool => filled($record->cv_path)),
             ]);
     }
 }

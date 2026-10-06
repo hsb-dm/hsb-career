@@ -1294,6 +1294,12 @@ h1 span {
     text-align: left;
 }
 
+.talent-field>input[aria-invalid="true"],
+.talent-select-trigger[aria-invalid="true"],
+.talent-field:has(input[type="file"][aria-invalid="true"]) .talent-upload {
+    border-color: #ffb7b7;
+}
+
 .talent-field>input:focus-visible,
 .talent-select-trigger:focus-visible,
 .talent-upload:focus-within,
@@ -2618,11 +2624,16 @@ h1 span {
 .application-field label { display: block; margin-bottom: 9px; line-height: 1.5; }
 .application-field label span, .application-error { color: #ffb0a8; }
 .application-field input, .application-field select, .application-field textarea { width: 100%; box-sizing: border-box; border: 1px solid #526157; border-radius: 8px; background: #0d1713; color: #fff; padding: 12px 14px; font: inherit; }
+.application-field input[type="file"] { cursor: pointer; }
+.application-field input[type="file"]::file-selector-button { margin-right: 14px; border: 0; border-radius: 5px; background: #a7cb19; color: #0d1713; padding: 8px 12px; font: inherit; font-weight: 600; cursor: pointer; }
 .application-field textarea { resize: vertical; }
 .application-field input:focus-visible, .application-field select:focus-visible, .application-field textarea:focus-visible { outline: 2px solid #a7cb19; outline-offset: 2px; }
 .application-field [aria-invalid="true"] { border-color: #ffb0a8; }
 .application-other-label { margin-top: 11px; color: #b8c0bb; font-size: .9rem; }
 .application-error { margin: 6px 0 0; font-size: .9rem; }
 .application-errors { background: #4b2425; border: 1px solid #ffb0a8; border-radius: 8px; padding: 12px; margin-bottom: 22px; }
+.application-errors p { margin: 0 0 8px; }
+.application-errors ul { margin: 0; padding-left: 20px; }
+.application-errors a { color: #fff; text-decoration: underline; }
 .application-submit { border: 0; cursor: pointer; }
 .application-success a { color: #a7cb19; }

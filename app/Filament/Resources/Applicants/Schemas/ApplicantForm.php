@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Applicants\Schemas;
 
 use App\Enums\ApplicantStatus;
+use App\Models\Applicant;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
@@ -47,7 +47,7 @@ class ApplicantForm
                             ->required(),
                         Select::make('status')
                             ->options(ApplicantStatus::options())
-                            ->default(ApplicantStatus::New->value)
+                            ->default(ApplicantStatus::AiAtsScreened->value)
                             ->required(),
                         TextInput::make('current_salary')
                             ->label('Current salary')
@@ -69,26 +69,11 @@ class ApplicantForm
                     ->columns(2),
                 Section::make('CV')
                     ->schema([
-                        FileUpload::make('cv_path')
+                        TextEntry::make('cv_path')
                             ->label('CV file')
-                            ->disk('local')
-                            ->directory('cvs')
-                            ->acceptedFileTypes([
-                                'application/pdf',
-                                'application/msword',
-                                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            ])
-                            ->maxSize(5120)
-                            ->downloadable()
-                            ->openable(),
-                    ]),
-                Section::make('Internal HR note')
-                    ->schema([
-                        Textarea::make('hr_note')
-                            ->label('HR note')
-                            ->rows(5)
-                            ->columnSpanFull(),
-                    ]),
+                            ->state(fn (Applicant $record): string => basename($record->cv_path)),
+                    ])
+                    ->visible(fn (?Applicant $record): bool => filled($record?->cv_path)),
             ]);
     }
 }

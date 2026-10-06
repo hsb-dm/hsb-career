@@ -6,13 +6,19 @@ use App\Models\Applicant;
 use App\Models\Job;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 uses(RefreshDatabase::class);
+beforeEach(fn () => Storage::fake('local'));
 
 function applicationAnswers(): array
 {
     return [
         'name' => 'Ari Candidate',
+        'email' => 'ari@example.com',
+        'phone' => '+62 812-3456-7890',
+        'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
         'current_age' => 27,
         'marital_status' => 'Single',
         'current_status' => 'Still Working / employed',
@@ -41,21 +47,26 @@ test('apply page follows the screening form and submits to the selected job', fu
     $this->get(route('vacancies.apply', $job->slug))
         ->assertOk()
         ->assertSee('Application Screening Interview')
+        ->assertSee('CV / Resume (PDF, max 5 MB)')
+        ->assertSee('enctype="multipart/form-data"', false)
         ->assertSee('Reference Check Contact Details From Latest Company')
         ->assertDontSee('Applying for Job Position');
 
     $this->post(route('vacancies.apply.store', $job->slug), [
         ...applicationAnswers(),
         'job_id' => 9999,
-        'status' => 'accepted',
+        'status' => 'hired',
     ])->assertRedirect(route('vacancies.apply', $job->slug));
 
     $applicant = Applicant::query()->sole();
     expect($applicant->job_id)->toBe($job->id)
-        ->and($applicant->status->value)->toBe('new')
-        ->and($applicant->email)->toBeNull()
+        ->and($applicant->status->value)->toBe('ai_ats_screened')
+        ->and($applicant->email)->toBe('ari@example.com')
+        ->and($applicant->phone)->toBe('+62 812-3456-7890')
+        ->and($applicant->cv_path)->toStartWith('cvs/')
         ->and($applicant->current_salary_answer)->toBe('Rp 8.000.000')
         ->and($applicant->serious_disease)->toBeFalse();
+    Storage::disk('local')->assertExists($applicant->cv_path);
 
     $this->get(route('vacancies.apply', $job->slug))->assertSee('Application submitted');
     $this->actingAs(User::factory()->create())
@@ -63,6 +74,7 @@ test('apply page follows the screening form and submits to the selected job', fu
         ->assertOk()
         ->assertSee('Budi, Manager, budi@example.com')
         ->assertSee('Rp 10.000.000 negotiable');
+    $this->get(route('admin.applicants.cv.preview', $applicant))->assertOk();
 });
 
 test('application validates required answers and other choices', function () {
@@ -70,7 +82,7 @@ test('application validates required answers and other choices', function () {
 
     $this->from(route('vacancies.apply', $job->slug))
         ->post(route('vacancies.apply.store', $job->slug), [])
-        ->assertSessionHasErrors(['name', 'current_age', 'marital_status', 'latest_company_reference']);
+        ->assertSessionHasErrors(['name', 'email', 'phone', 'cv', 'current_age', 'marital_status', 'latest_company_reference']);
 
     $this->from(route('vacancies.apply', $job->slug))
         ->post(route('vacancies.apply.store', $job->slug), [
@@ -78,6 +90,60 @@ test('application validates required answers and other choices', function () {
             'marital_status' => 'Other',
             'serious_disease' => 'yes',
         ])->assertSessionHasErrors(['marital_status_other', 'serious_disease_details']);
+
+    expect(Applicant::query()->count())->toBe(0);
+});
+
+test('application requires a PDF CV no larger than 5 MB', function () {
+    $job = Job::factory()->create(['status' => JobStatus::Active]);
+
+    foreach ([
+        null,
+        UploadedFile::fake()->create('resume.docx', 100, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+        UploadedFile::fake()->create('resume.pdf', 5121, 'application/pdf'),
+    ] as $cv) {
+        $answers = applicationAnswers();
+        if ($cv === null) {
+            unset($answers['cv']);
+        } else {
+            $answers['cv'] = $cv;
+        }
+
+        $this->post(route('vacancies.apply.store', $job->slug), $answers)
+            ->assertSessionHasErrors('cv');
+    }
+
+    expect(Applicant::query()->count())->toBe(0);
+    Storage::disk('local')->assertDirectoryEmpty('cvs');
+});
+
+test('application rejects invalid email and phone number', function () {
+    $job = Job::factory()->create(['status' => JobStatus::Active]);
+
+    $this->from(route('vacancies.apply', $job->slug))
+        ->post(route('vacancies.apply.store', $job->slug), [
+            ...applicationAnswers(),
+            'email' => 'invalid-email',
+            'phone' => 'not-a-phone',
+        ])->assertSessionHasErrors(['email', 'phone']);
+
+    expect(Applicant::query()->count())->toBe(0);
+});
+
+test('application rejects invalid age and choice with clear field errors', function () {
+    $job = Job::factory()->create(['status' => JobStatus::Active]);
+
+    $this->followingRedirects()->from(route('vacancies.apply', $job->slug))
+        ->post(route('vacancies.apply.store', $job->slug), [
+            ...applicationAnswers(),
+            'current_age' => 0,
+            'english_fluency' => 'Unknown level',
+            'motivation' => str_repeat('A', 5001),
+        ])
+        ->assertSee('Current Age must be between 1 and 120.')
+        ->assertSee('href="#current_age"', false)
+        ->assertSee('aria-describedby="current_age-error"', false)
+        ->assertSee('value="0"', false);
 
     expect(Applicant::query()->count())->toBe(0);
 });

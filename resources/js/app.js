@@ -141,11 +141,22 @@ if (gallery) initGallery(gallery);
 const talentSelect = document.querySelector('[data-talent-select]');
 if (talentSelect) {
     const value = talentSelect.querySelector('input[name="area_of_interest"]');
-    const listbox = setupListbox(talentSelect, value, talentSelect.querySelector('[data-talent-selection]'));
+    const interestError = talentSelect.querySelector('[data-talent-interest-error]');
+    const showInterestError = (show) => {
+        interestError.hidden = !show;
+        listbox.trigger.setAttribute('aria-invalid', String(show));
+    };
+    const listbox = setupListbox(
+        talentSelect,
+        value,
+        talentSelect.querySelector('[data-talent-selection]'),
+        () => showInterestError(false),
+    );
 
     document.querySelector('.talent-form')?.addEventListener('submit', (event) => {
         if (!value.value) {
             event.preventDefault();
+            showInterestError(true);
             listbox.trigger.focus();
             listbox.open();
         }
@@ -155,7 +166,23 @@ if (talentSelect) {
 const talentFile = document.querySelector('.talent-upload input[type="file"]');
 talentFile?.addEventListener('change', () => {
     const fileName = document.querySelector('[data-talent-file-name]');
-    if (fileName) fileName.textContent = talentFile.files?.[0]?.name || 'Upload CV';
+    const file = talentFile.files?.[0];
+    if (fileName) fileName.textContent = file?.name || 'Upload CV';
+
+    let error = '';
+    if (file && !/\.(pdf|doc|docx)$/i.test(file.name)) {
+        error = 'Upload a PDF, DOC, or DOCX file.';
+    } else if (file && file.size > 5 * 1024 * 1024) {
+        error = 'CV file must be no larger than 5 MB.';
+    }
+
+    talentFile.setCustomValidity(error);
+    talentFile.setAttribute('aria-invalid', String(Boolean(error)));
+    const errorElement = document.querySelector('[data-talent-cv-error]');
+    if (errorElement) {
+        errorElement.textContent = error;
+        errorElement.hidden = !error;
+    }
 });
 
 const applicationForm = document.querySelector('.application-form');

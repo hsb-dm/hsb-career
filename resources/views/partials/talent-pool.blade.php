@@ -19,23 +19,23 @@
             <p class="talent-intro">We're growing fast and new roles open regularly.<br>Leave your details and we'll
                 reach out when something that fits comes up.</p>
             <form class="talent-form" action="{{ route('talent-pool.store') }}" method="POST"
-                enctype="multipart/form-data" aria-label="Join our talent pool" novalidate>
+                enctype="multipart/form-data" aria-label="Join our talent pool">
                 @csrf
                 <input type="hidden" name="return_to" value="{{ $talentReturnRoute }}">
                 <div class="talent-field">
                     <input name="name" type="text" placeholder="Full Name" aria-label="Full Name"
-                        autocomplete="name" value="{{ old('name') }}" required maxlength="150">
-                    @error('name') <span class="talent-error">{{ $message }}</span> @enderror
+                        autocomplete="name" value="{{ old('name') }}" required maxlength="150" aria-invalid="{{ $errors->has('name') ? 'true' : 'false' }}" @if ($errors->has('name')) aria-describedby="talent-name-error" @endif>
+                    @error('name') <span class="talent-error" id="talent-name-error">{{ $message }}</span> @enderror
                 </div>
                 <div class="talent-field">
                     <input name="email" type="email" placeholder="Email Address" aria-label="Email Address"
-                        autocomplete="email" value="{{ old('email') }}" required maxlength="255">
-                    @error('email') <span class="talent-error">{{ $message }}</span> @enderror
+                        autocomplete="email" value="{{ old('email') }}" required maxlength="255" aria-invalid="{{ $errors->has('email') ? 'true' : 'false' }}" @if ($errors->has('email')) aria-describedby="talent-email-error" @endif>
+                    @error('email') <span class="talent-error" id="talent-email-error">{{ $message }}</span> @enderror
                 </div>
                 <div class="talent-field talent-select" data-talent-select>
                     <input type="hidden" name="area_of_interest" value="{{ old('area_of_interest') }}">
                     <button class="talent-select-trigger" type="button" aria-haspopup="listbox"
-                        aria-expanded="false" aria-controls="talent-interest-options">
+                        aria-expanded="false" aria-controls="talent-interest-options" aria-invalid="{{ $errors->has('area_of_interest') ? 'true' : 'false' }}" aria-describedby="talent-interest-client-error{{ $errors->has('area_of_interest') ? ' talent-interest-error' : '' }}">
                         <span data-talent-selection>{{ old('area_of_interest', 'Area of interest') }}</span>
                         <span class="talent-chevron" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="m4 7 6 6 6-6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
                     </button>
@@ -47,14 +47,16 @@
                                 data-value="{{ $interest }}">{{ $interest }}</button>
                         @endforeach
                     </div>
-                    @error('area_of_interest') <span class="talent-error">{{ $message }}</span> @enderror
+                    <span class="talent-error" id="talent-interest-client-error" data-talent-interest-error role="alert" hidden>Please choose an area of interest.</span>
+                    @error('area_of_interest') <span class="talent-error" id="talent-interest-error">{{ $message }}</span> @enderror
                 </div>
                 <div class="talent-field">
                     <label class="talent-upload">
                         <span data-talent-file-name>Upload CV</span><span class="talent-upload-button">Upload</span>
-                        <input name="cv" type="file" accept=".pdf,.doc,.docx" required aria-label="Upload CV">
+                        <input name="cv" type="file" accept=".pdf,.doc,.docx" required aria-label="Upload CV" aria-invalid="{{ $errors->has('cv') ? 'true' : 'false' }}" aria-describedby="talent-cv-client-error{{ $errors->has('cv') ? ' talent-cv-error' : '' }}">
                     </label>
-                    @error('cv') <span class="talent-error">{{ $message }}</span> @enderror
+                    <span class="talent-error" id="talent-cv-client-error" data-talent-cv-error role="alert" hidden></span>
+                    @error('cv') <span class="talent-error" id="talent-cv-error">{{ $message }}</span> @enderror
                 </div>
                 <button class="button button-lime talent-button" type="submit">Join Our Talent Pool
                     <svg class="button-arrow" width="28" height="28" viewBox="0 0 28 28" fill="none"

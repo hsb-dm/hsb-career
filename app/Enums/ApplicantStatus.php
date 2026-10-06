@@ -4,31 +4,41 @@ namespace App\Enums;
 
 enum ApplicantStatus: string
 {
-    case New = 'new';
-    case Reviewing = 'reviewing';
-    case Interview = 'interview';
-    case Accepted = 'accepted';
+    case AiAtsScreened = 'ai_ats_screened';
+    case HrInterview = 'hr_interview';
+    case ForwardedToUser = 'forwarded_to_user';
+    case UserInterview = 'user_interview';
+    case Hired = 'hired';
     case Rejected = 'rejected';
+    case OnHold = 'on_hold';
+    case NoShow = 'no_show';
+    case WithdrawDecline = 'withdraw_decline';
+    case StudyCase = 'study_case';
 
     public function label(): string
     {
         return match ($this) {
-            self::New => 'New',
-            self::Reviewing => 'Reviewing',
-            self::Interview => 'Interview',
-            self::Accepted => 'Accepted',
+            self::AiAtsScreened => 'AI ATS Screened',
+            self::HrInterview => 'HR Interview',
+            self::ForwardedToUser => 'Forwarded to User',
+            self::UserInterview => 'User Interview',
+            self::Hired => 'Hired',
             self::Rejected => 'Rejected',
+            self::OnHold => 'On Hold',
+            self::NoShow => 'No show',
+            self::WithdrawDecline => 'Withdraw/Decline',
+            self::StudyCase => 'Study Case',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::New => 'gray',
-            self::Reviewing => 'info',
-            self::Interview => 'warning',
-            self::Accepted => 'success',
-            self::Rejected => 'danger',
+            self::AiAtsScreened => 'gray',
+            self::HrInterview, self::ForwardedToUser, self::StudyCase => 'info',
+            self::UserInterview, self::OnHold => 'warning',
+            self::Hired => 'success',
+            self::Rejected, self::NoShow, self::WithdrawDecline => 'danger',
         };
     }
 

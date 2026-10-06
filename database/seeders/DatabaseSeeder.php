@@ -84,5 +84,7 @@ HTML;
                 ],
             );
         }
+
+        $this->call(RecruitmentDemoSeeder::class);
     }
 }

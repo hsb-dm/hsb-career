@@ -26,10 +26,17 @@
                     <a href="{{ route('vacancies.index') }}">View other vacancies</a>
                 </div>
             @else
-                <form class="application-form" action="{{ route('vacancies.apply.store', $job->slug) }}" method="POST">
+                <form class="application-form" action="{{ route('vacancies.apply.store', $job->slug) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @if ($errors->any())
-                        <div class="application-errors" role="alert">Please correct the highlighted fields below.</div>
+                        <div class="application-errors" role="alert">
+                            <p>Please correct the following fields:</p>
+                            <ul>
+                                @foreach ($errors->messages() as $name => $messages)
+                                    <li><a href="#{{ $name }}">{{ $messages[0] }}</a></li>
+                                @endforeach
+                            </ul>
+                        </div>
                     @endif
                     <p class="application-required">Fields marked * are required.</p>
 

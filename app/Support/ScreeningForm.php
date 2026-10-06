@@ -9,13 +9,16 @@ class ScreeningForm
     /**
      * A single definition drives the public form and its server-side validation.
      *
-     * @return array<string, array<string, array{label: string, type: 'text'|'textarea'|'number', required?: bool}|array{label: string, type: 'select', required: bool, options: array<string, string>}>>
+     * @return array<string, array<string, array{label: string, type: 'text'|'email'|'tel'|'textarea'|'number'|'file', required?: bool}|array{label: string, type: 'select', required: bool, options: array<string, string>}>>
      */
     public static function sections(): array
     {
         return [
             'Personal details' => [
                 'name' => ['label' => 'Full Name', 'type' => 'text', 'required' => true],
+                'email' => ['label' => 'Email Address', 'type' => 'email', 'required' => true],
+                'phone' => ['label' => 'Phone Number', 'type' => 'tel', 'required' => true],
+                'cv' => ['label' => 'CV / Resume (PDF, max 5 MB)', 'type' => 'file', 'required' => true],
                 'current_age' => ['label' => 'Current Age', 'type' => 'number', 'required' => true],
                 'marital_status' => ['label' => 'Marital Status', 'type' => 'select', 'required' => true, 'options' => self::options(['Single', 'Married'])],
                 'current_status' => ['label' => 'Current Status', 'type' => 'select', 'required' => true, 'options' => self::options(['Still Working / employed', 'Available / free / unemployed'])],
@@ -67,6 +70,20 @@ class ScreeningForm
                             $rules[$name.'_other'] = ['required_if:'.$name.',Other', 'nullable', 'string', 'max:255'];
                         }
                         break;
+                    case 'email':
+                        $rules[$name][] = 'email';
+                        $rules[$name][] = 'max:255';
+                        break;
+                    case 'tel':
+                        $rules[$name][] = 'string';
+                        $rules[$name][] = 'regex:/^\+?[0-9][0-9\s().-]{6,24}$/';
+                        $rules[$name][] = 'max:25';
+                        break;
+                    case 'file':
+                        $rules[$name][] = 'file';
+                        $rules[$name][] = 'mimes:pdf';
+                        $rules[$name][] = 'max:5120';
+                        break;
                     default:
                         $rules[$name][] = 'string';
                         $rules[$name][] = $field['type'] === 'textarea' ? 'max:5000' : 'max:255';
@@ -77,6 +94,46 @@ class ScreeningForm
         $rules['serious_disease_details'][] = 'required_if:serious_disease,yes';
 
         return $rules;
+    }
+
+    /** @return array<string, string> */
+    public static function attributes(): array
+    {
+        $attributes = [];
+
+        foreach (self::sections() as $fields) {
+            foreach ($fields as $name => $field) {
+                $attributes[$name] = $field['label'];
+
+                if ($field['type'] === 'select' && $name !== 'serious_disease') {
+                    $attributes[$name.'_other'] = $field['label'].' (Other)';
+                }
+            }
+        }
+
+        return $attributes;
+    }
+
+    /** @return array<string, string> */
+    public static function messages(): array
+    {
+        $messages = [
+            'current_age.between' => 'Current Age must be between 1 and 120.',
+            'phone.regex' => 'Phone Number must be a valid phone number.',
+            'cv.mimes' => 'Upload a PDF file for your CV / Resume.',
+            'cv.max' => 'CV / Resume must be no larger than 5 MB.',
+            'serious_disease_details.required_if' => 'Please describe the illness/disease when you select Yes.',
+        ];
+
+        foreach (self::sections() as $fields) {
+            foreach ($fields as $name => $field) {
+                if ($field['type'] === 'select' && $name !== 'serious_disease') {
+                    $messages[$name.'_other.required_if'] = 'Please specify '.$field['label'].' when choosing Other.';
+                }
+            }
+        }
+
+        return $messages;
     }
 
     /** @param array<string, mixed> $data

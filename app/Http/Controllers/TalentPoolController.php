@@ -18,6 +18,13 @@ class TalentPoolController extends Controller
             'email' => ['required', 'email', 'max:255'],
             'area_of_interest' => ['required', Rule::in(TalentPoolEntry::AREAS_OF_INTEREST)],
             'cv' => ['required', 'file', 'mimes:pdf,doc,docx', 'max:5120'],
+        ], [
+            'area_of_interest.in' => 'Choose a valid area of interest.',
+            'cv.mimes' => 'Upload a PDF, DOC, or DOCX file.',
+            'cv.max' => 'CV file must be no larger than 5 MB.',
+        ], [
+            'area_of_interest' => 'area of interest',
+            'cv' => 'CV',
         ]);
 
         if ($validator->fails()) {
