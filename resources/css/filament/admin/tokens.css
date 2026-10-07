@@ -1,0 +1,45 @@
+:root {
+    --color-paper: #f5f7fc;
+    --color-surface: #ffffff;
+    --color-surface-soft: #f8faff;
+    --color-ink: #1e293b;
+    --color-ink-muted: #64748b;
+    --color-rule: #dbe3f0;
+    --color-accent: #1b39e6;
+    --color-accent-strong: #0f2080;
+    --color-accent-soft: #e8edff;
+    --color-on-accent: #ffffff;
+    --color-focus: #1b39e6;
+    --color-hero: #0f2080;
+    --color-hero-hover: #1b39e6;
+    --color-hero-ink: #ffffff;
+    --color-hero-muted: #dce4ff;
+    --color-hero-highlight: #dbe3ff;
+    --color-shadow: rgb(15 32 128 / 0.06);
+    --font-body: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --radius-card: 1rem;
+    --radius-control: 0.625rem;
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-short: 180ms;
+}
+
+.dark {
+    --color-paper: #101729;
+    --color-surface: #1b2540;
+    --color-surface-soft: #243152;
+    --color-ink: #edf1ff;
+    --color-ink-muted: #b5c1df;
+    --color-rule: #344568;
+    --color-accent: #91a7ff;
+    --color-accent-strong: #c5d0ff;
+    --color-accent-soft: #263864;
+    --color-on-accent: #0c1737;
+    --color-focus: #afc0ff;
+    --color-shadow: rgb(0 0 0 / 0.14);
+}

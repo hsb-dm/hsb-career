@@ -28,6 +28,25 @@ Dashboard tersedia di:
 http://127.0.0.1:8000/admin
 ```
 
+Untuk membagikan aplikasi lokal melalui ngrok, gunakan asset hasil build. Hentikan `npm run dev` / `php artisan dev`, lalu jalankan:
+
+```bash
+npm run build
+rm -f public/hot
+```
+
+Jalankan server dan ngrok di dua terminal terpisah:
+
+```bash
+php artisan serve
+```
+
+```bash
+ngrok http 8000
+```
+
+File `public/hot` membuat Laravel mengambil CSS/JS dari Vite di `localhost:5173`, yang tidak dapat diakses pengunjung melalui ngrok. Aplikasi lokal mempercayai header HTTPS hanya dari proxy loopback agar URL asset yang dihasilkan memakai `https://`.
+
 Development credentials:
 
 ```text

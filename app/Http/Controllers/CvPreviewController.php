@@ -14,6 +14,14 @@ class CvPreviewController extends Controller
         return $this->preview($applicant->cv_path);
     }
 
+    public function applicantDownload(Applicant $applicant): StreamedResponse
+    {
+        $path = $applicant->cv_path;
+        abort_if(blank($path) || ! Storage::disk('local')->exists($path), 404, 'CV file is not available.');
+
+        return Storage::disk('local')->download($path, basename($path));
+    }
+
     public function talentPool(TalentPoolEntry $entry): StreamedResponse
     {
         return $this->preview($entry->cv_path);

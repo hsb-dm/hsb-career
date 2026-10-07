@@ -27,6 +27,20 @@ test('homepage shows active jobs and hides inactive jobs', function () {
         ->assertDontSee('Inactive Finance Role');
 });
 
+test('local loopback proxy keeps generated asset URLs on HTTPS', function () {
+    $this->withServerVariables([
+        'REMOTE_ADDR' => '127.0.0.1',
+    ])->get('http://demo.ngrok-free.app/', ['X-Forwarded-Proto' => 'https'])
+        ->assertOk()
+        ->assertSee('https://demo.ngrok-free.app/build/assets/', false);
+
+    $this->withServerVariables([
+        'REMOTE_ADDR' => '192.0.2.10',
+    ])->get('http://demo.ngrok-free.app/', ['X-Forwarded-Proto' => 'https'])
+        ->assertOk()
+        ->assertSee('http://demo.ngrok-free.app/build/assets/', false);
+});
+
 test('homepage shows at most five jobs and only offers all vacancies when there are more', function () {
     Job::factory()->count(5)->create(['status' => JobStatus::Active]);
 

@@ -72,6 +72,7 @@
     ];
 @endphp
 
+@if ($showAwards ?? true)
 <section class="awards-strip" aria-labelledby="awards-title">
     <div class="container awards-inner">
         <h2 id="awards-title">Memenangkan<br>Berbagai Macam<br>Penghargaan</h2>
@@ -82,6 +83,7 @@
         </ul>
     </div>
 </section>
+@endif
 
 <footer class="footer">
     <div class="container footer-main">

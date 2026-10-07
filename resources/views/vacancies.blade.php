@@ -6,7 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#080909">
     <title>Open Positions at HSB Investasi</title>
-    <meta name="description" content="Explore open positions and build your career with HSB Investasi.">
+    @include('partials.seo', [
+        'title' => 'Open Positions at HSB Investasi',
+        'description' => 'Explore open positions and build your career with HSB Investasi.',
+        'canonical' => route('vacancies.index'),
+    ])
     <link rel="preload" href="{{ asset('fonts/hsb/Juturu-VariableVF.woff2?v=20261001') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ asset('fonts/hsb/StolzlRegular.ttf?v=20261001') }}" as="font" type="font/ttf" crossorigin>
     <link rel="preload" href="{{ asset('fonts/hsb/StolzlMedium.ttf?v=20261001') }}" as="font" type="font/ttf" crossorigin>

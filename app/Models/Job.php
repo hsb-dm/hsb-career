@@ -60,6 +60,10 @@ class Job extends Model
             if (blank($job->slug) && filled($job->title)) {
                 $job->slug = static::uniqueSlug($job->title, $job->id);
             }
+
+            if ($job->status === JobStatus::Active && ! $job->published_at) {
+                $job->published_at = now();
+            }
         });
     }
 

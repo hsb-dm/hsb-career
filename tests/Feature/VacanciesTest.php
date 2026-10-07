@@ -46,7 +46,13 @@ test('active vacancy has a detail page and inactive vacancy is hidden', function
         ->assertSee('Date Posted')
         ->assertSee('About the Role')
         ->assertSee('class="vacancy-apply-card"', false)
-        ->assertSee('data-vacancy-read-more', false)
+        ->assertSee('class="vacancy-card-details"', false)
+        ->assertSee($active->department)
+        ->assertSee(str_replace(' ', '-', $active->employment_type->label()))
+        ->assertSee($active->location)
+        ->assertSee(route('vacancies.apply', $active->slug))
+        ->assertDontSee('data-vacancy-read-more', false)
+        ->assertDontSee('Read More')
         ->assertSee('Lead our compliance team.')
         ->assertDontSee('<script>', false);
 

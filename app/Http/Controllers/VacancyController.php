@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Job;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Response;
 
 class VacancyController extends Controller
 {
@@ -23,6 +24,19 @@ class VacancyController extends Controller
         return view('vacancies-show', [
             'job' => Job::query()->active()->where('slug', $slug)->firstOrFail(),
         ]);
+    }
+
+    public function sitemap(): Response
+    {
+        $jobs = Job::query()
+            ->active()
+            ->select(['slug', 'updated_at'])
+            ->orderBy('id')
+            ->get();
+
+        return response()
+            ->view('sitemap', ['jobs' => $jobs])
+            ->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
     /** @return Builder<Job> */

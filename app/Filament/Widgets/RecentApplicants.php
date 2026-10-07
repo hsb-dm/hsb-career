@@ -12,20 +12,23 @@ use Illuminate\Database\Eloquent\Builder;
 
 class RecentApplicants extends TableWidget
 {
-    protected int|string|array $columnSpan = [
-        'md' => 2,
-        'xl' => 2,
-    ];
+    protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Recent applicants')
+            ->heading('Latest applications')
+            ->description('Open a profile to review answers, CV, and current status.')
+            ->emptyStateHeading('No applications yet')
+            ->emptyStateDescription('New applications will appear here when candidates submit a form.')
             ->query(fn (): Builder => Applicant::query()->with('job')->latest('applied_at')->limit(10))
             ->paginated(false)
-            ->recordUrl(fn (Applicant $record): string => ApplicantResource::getUrl('view', ['record' => $record]))
+            ->recordUrl(
+                fn (Applicant $record): string => ApplicantResource::getUrl('view', ['record' => $record]),
+                shouldOpenInNewTab: true,
+            )
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')->weight('semibold'),
                 TextColumn::make('job.title')
                     ->label('Job'),
                 TextColumn::make('status')

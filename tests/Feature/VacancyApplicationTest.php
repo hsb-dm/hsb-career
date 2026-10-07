@@ -50,6 +50,7 @@ test('apply page follows the screening form and submits to the selected job', fu
         ->assertSee('CV / Resume (PDF, max 5 MB)')
         ->assertSee('enctype="multipart/form-data"', false)
         ->assertSee('Reference Check Contact Details From Latest Company')
+        ->assertDontSee('class="awards-strip"', false)
         ->assertDontSee('Applying for Job Position');
 
     $this->post(route('vacancies.apply.store', $job->slug), [

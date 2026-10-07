@@ -11,7 +11,9 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class RecruitmentStatsOverview extends StatsOverviewWidget
 {
-    protected ?string $heading = 'Recruitment overview';
+    protected ?string $heading = 'At a glance';
+
+    protected ?string $description = 'Current activity across your vacancies and applicants.';
 
     /**
      * @return array<Stat>
@@ -26,20 +28,20 @@ class RecruitmentStatsOverview extends StatsOverviewWidget
             ->first()?->toArray() ?? [];
 
         return [
-            Stat::make('Total active jobs', Job::query()->where('status', JobStatus::Active)->count())
-                ->description('Active jobs')
+            Stat::make('Open vacancies', Job::query()->where('status', JobStatus::Active)->count())
+                ->description('Currently accepting applications')
                 ->color('success'),
             Stat::make('Total applicants', (int) ($counts['total'] ?? 0))
-                ->description('All applications')
+                ->description('Across all vacancies')
                 ->color('gray'),
             Stat::make('AI ATS Screened', (int) ($counts['screened_count'] ?? 0))
-                ->description('Screening stage')
+                ->description('Ready for review')
                 ->color('info'),
             Stat::make('HR Interview', (int) ($counts['hr_interview_count'] ?? 0))
-                ->description('HR interview stage')
+                ->description('In the interview stage')
                 ->color('warning'),
             Stat::make('Hired', (int) ($counts['hired_count'] ?? 0))
-                ->description('Hired candidates')
+                ->description('Completed hires')
                 ->color('success'),
         ];
     }

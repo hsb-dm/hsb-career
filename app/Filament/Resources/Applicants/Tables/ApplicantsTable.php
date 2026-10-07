@@ -3,11 +3,11 @@
 namespace App\Filament\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
+use App\Filament\Resources\Applicants\Actions\ApplicantViewAction;
 use App\Models\Applicant;
 use App\Support\Rupiah;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -79,7 +79,7 @@ class ApplicantsTable
                         ->when($data['until'] ?? null, fn (Builder $query, string $date) => $query->whereDate('applied_at', '<=', $date))),
             ])
             ->recordActions([
-                ViewAction::make(),
+                ApplicantViewAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

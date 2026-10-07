@@ -2,19 +2,20 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\RecruitmentDashboard;
 use App\Filament\Widgets\ApplicantsByStatusChart;
 use App\Filament\Widgets\ApplicantsPerJob;
 use App\Filament\Widgets\RecentApplicants;
 use App\Filament\Widgets\RecruitmentStatsOverview;
+use App\Filament\Widgets\RecruitmentWelcome;
+use App\Http\Middleware\NoIndex;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -32,24 +33,25 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
-            ->brandName('HSB HR Dashboard')
+            ->brandName('HSB Recruitment')
             ->colors([
                 'primary' => Color::hex('#1b39e6'),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([
-                Dashboard::class,
+                RecruitmentDashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                AccountWidget::class,
+                RecruitmentWelcome::class,
                 RecruitmentStatsOverview::class,
-                ApplicantsByStatusChart::class,
                 RecentApplicants::class,
+                ApplicantsByStatusChart::class,
                 ApplicantsPerJob::class,
             ])
             ->middleware([
+                NoIndex::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,

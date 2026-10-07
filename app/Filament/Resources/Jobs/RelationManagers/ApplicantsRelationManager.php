@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\Jobs\RelationManagers;
 
+use App\Filament\Resources\Applicants\Actions\ApplicantViewAction;
 use App\Filament\Resources\Applicants\Schemas\ApplicantForm;
 use App\Filament\Resources\Applicants\Tables\ApplicantsTable;
-use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
@@ -23,7 +23,7 @@ class ApplicantsRelationManager extends RelationManager
         return ApplicantsTable::configure($table)
             ->headerActions([])
             ->recordActions([
-                ViewAction::make(),
+                ApplicantViewAction::make(),
             ]);
     }
 }

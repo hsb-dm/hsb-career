@@ -205,26 +205,3 @@ if (applicationForm) {
     healthAnswer.addEventListener('change', syncHealth);
     syncHealth();
 }
-
-const vacancyDescription = document.querySelector('[data-vacancy-description]');
-const vacancyReadMore = document.querySelector('[data-vacancy-read-more]');
-if (vacancyDescription && vacancyReadMore) {
-    vacancyDescription.classList.add('is-collapsed');
-
-    if (vacancyDescription.scrollHeight > vacancyDescription.clientHeight + 1) {
-        vacancyReadMore.hidden = false;
-        vacancyReadMore.addEventListener('click', () => {
-            const expanded = vacancyReadMore.getAttribute('aria-expanded') === 'true';
-            vacancyDescription.classList.toggle('is-collapsed', expanded);
-            vacancyReadMore.setAttribute('aria-expanded', String(!expanded));
-            vacancyReadMore.querySelector('[data-read-more-label]').textContent = expanded ? 'Read More' : 'Read Less';
-
-            if (expanded) vacancyDescription.scrollIntoView({
-                behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
-                block: 'start',
-            });
-        });
-    } else {
-        vacancyDescription.classList.remove('is-collapsed');
-    }
-}

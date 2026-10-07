@@ -2401,17 +2401,10 @@ h1 span {
 
 .vacancy-description {
     width: 100%;
-    scroll-margin-top: 85px;
     color: var(--color-white);
     font-family: var(--font-body);
     font-size: 18px;
     line-height: 1.18;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .vacancy-read-more svg {
-        transition: none;
-    }
 }
 
 .vacancy-description h2,
@@ -2449,42 +2442,6 @@ h1 span {
     padding-left: 0;
 }
 
-.vacancy-description.is-collapsed {
-    max-height: 620px;
-    overflow: hidden;
-    -webkit-mask-image: linear-gradient(#000 0%, #000 82%, transparent 100%);
-    mask-image: linear-gradient(#000 0%, #000 82%, transparent 100%);
-}
-
-.vacancy-read-more {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    min-height: 44px;
-    margin-top: 16px;
-    padding: 0 22px;
-    border: 1px solid var(--color-accent);
-    border-radius: var(--radius-pill);
-    background: transparent;
-    color: var(--color-accent);
-    font-family: var(--font-medium);
-    font-size: 15px;
-}
-
-.vacancy-read-more[hidden] {
-    display: none;
-}
-
-.vacancy-read-more svg {
-    transition: transform .2s ease;
-}
-
-.vacancy-read-more[aria-expanded='true'] svg {
-    transform: rotate(180deg);
-}
-
-.vacancy-read-more:focus-visible,
 .vacancy-apply:focus-visible {
     outline: 2px solid var(--color-accent);
     outline-offset: 4px;
@@ -2497,9 +2454,9 @@ h1 span {
     flex-direction: column;
     min-width: 0;
     padding: 30px;
-    border: 1px solid #464a47;
+    border: 1px solid #242826;
     border-radius: 20px;
-    background: #1c1e1d;
+    background: #1b1e1c;
     box-shadow: 0 16px 40px #0003;
 }
 
@@ -2512,19 +2469,28 @@ h1 span {
     line-height: 1.12;
 }
 
-.vacancy-card-date {
-    display: flex;
-    align-items: center;
-    gap: 9px;
+.vacancy-card-details {
+    display: grid;
+    gap: 10px;
     margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
     color: var(--color-white);
-    font-size: 13px;
-    line-height: 1.4;
+    font-family: var(--font-medium);
+    font-size: 16px;
+    line-height: 1.2;
 }
 
-.vacancy-card-date svg {
-    width: 18px;
-    height: 18px;
+.vacancy-card-details li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.vacancy-card-details svg {
+    width: 20px;
+    height: 20px;
     flex: none;
 }
 
@@ -2534,6 +2500,13 @@ h1 span {
     margin-top: 28px;
     padding-inline: 28px;
     font-family: var(--font-medium);
+    font-size: 15px;
+    gap: 11px;
+}
+
+.vacancy-apply .button-arrow {
+    width: 24px;
+    height: 24px;
 }
 
 @media (max-width: 900px) {
@@ -2593,10 +2566,6 @@ h1 span {
     .vacancy-description {
         font-size: 16px;
         line-height: 1.35;
-    }
-
-    .vacancy-description.is-collapsed {
-        max-height: 480px;
     }
 
     .vacancy-description h2,

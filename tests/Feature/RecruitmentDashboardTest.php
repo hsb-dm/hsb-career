@@ -48,7 +48,9 @@ test('admin can open dashboard', function () {
     $this->actingAs(User::factory()->create())
         ->get('/admin')
         ->assertOk()
-        ->assertSee('Dashboard');
+        ->assertSee('A clear view of your hiring pipeline.')
+        ->assertSee('Review applicants')
+        ->assertSee('Manage jobs');
 });
 
 test('dashboard calculates applicant summary with one aggregate query', function () {
@@ -170,6 +172,25 @@ test('HR can change status from the applicant detail page', function () {
     expect($applicant->fresh()->status)->toBe(ApplicantStatus::StudyCase);
 });
 
+test('view applicant opens the detail page in a new tab with CV and status actions', function () {
+    Storage::fake('local');
+    $path = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf')->store('cvs', 'local');
+    $applicant = Applicant::factory()->create([
+        'cv_path' => $path,
+        'status' => ApplicantStatus::AiAtsScreened,
+    ]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ListApplicants::class)
+        ->assertTableActionHasUrl('view', ApplicantResource::getUrl('view', ['record' => $applicant]), $applicant)
+        ->assertTableActionShouldOpenUrlInNewTab('view', $applicant);
+
+    livewire(ViewApplicant::class, ['record' => $applicant->id])
+        ->assertActionVisible('updateStatus')
+        ->assertActionVisible('previewCv')
+        ->assertActionVisible('downloadCv');
+});
+
 test('existing applicant statuses are migrated to the new workflow', function () {
     $statuses = ['new', 'reviewing', 'interview', 'accepted'];
     $applicants = collect($statuses)->map(function (string $status): Applicant {
@@ -283,8 +304,12 @@ test('applicant CV preview remains private and serves PDF files', function () {
     $applicant = Applicant::factory()->create(['cv_path' => $path]);
 
     $this->get(route('admin.applicants.cv.preview', $applicant))->assertRedirect('/login');
+    $this->get(route('admin.applicants.cv.download', $applicant))->assertRedirect('/login');
     $this->actingAs(User::factory()->create())
         ->get(route('admin.applicants.cv.preview', $applicant))
         ->assertOk()
         ->assertHeader('Content-Type', 'application/pdf');
+    $this->get(route('admin.applicants.cv.download', $applicant))
+        ->assertOk()
+        ->assertHeader('Content-Disposition', 'attachment; filename='.basename($path));
 });
