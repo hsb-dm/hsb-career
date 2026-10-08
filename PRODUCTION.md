@@ -31,6 +31,16 @@ Check `http://127.0.0.1:8181/up` and the home page. A Cloudflare Tunnel running 
 
 Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8181`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
 
+## UAT demo data
+
+The default seeder creates an administrator account and vacancies for UAT:
+
+```bash
+docker compose --env-file .env.production -f compose.production.yaml exec app php artisan db:seed --force
+```
+
+The demo administrator credentials are `admin@example.com` and `password`. Do not run this seeder in production.
+
 ## Updates
 
 ```bash
