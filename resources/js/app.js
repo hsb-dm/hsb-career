@@ -306,3 +306,79 @@ if (applicationForm) {
     healthAnswer.addEventListener('change', syncHealth);
     syncHealth();
 }
+
+const reducedPageMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+if (!reducedPageMotion.matches) {
+    document.documentElement.classList.add('motion-enabled');
+
+    const entranceItems = [
+        document.querySelector('.site-header'),
+        document.querySelector('.hero-top'),
+        document.querySelector('.hero-copy'),
+        document.querySelector('.hero-image'),
+        document.querySelector('.application-back'),
+        document.querySelector('.application-heading'),
+    ].filter(Boolean);
+
+    entranceItems.forEach((item, index) => {
+        item.classList.add('motion-item', 'motion-entrance');
+        item.style.setProperty('--motion-delay', `${Math.min(index * 90, 270)}ms`);
+    });
+
+    window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+            entranceItems.forEach((item) => item.classList.add('is-visible'));
+        });
+    });
+
+    const revealSelectors = [
+        'main .section-title',
+        'main .section-intro',
+        '.mission-card',
+        '.values-pyramid',
+        '.value-point',
+        '.about-copy',
+        '.about-media',
+        '.person-card',
+        '.benefit-card',
+        '.life-gallery',
+        '.job-filters',
+        '.job-card',
+        '.talent-box',
+        '.vacancy-description',
+        '.vacancy-apply-card',
+        '.application-form',
+        '.application-success',
+        '.application-section',
+        '.awards-strip',
+        '.footer-columns',
+        '.footer-disclosures',
+        '.footer-legal',
+    ];
+    const revealItems = [...new Set(document.querySelectorAll(revealSelectors.join(',')))]
+        .filter((item) => !entranceItems.includes(item));
+
+    revealItems.forEach((item) => {
+        item.classList.add('motion-item', 'motion-reveal');
+        const siblings = [...(item.parentElement?.children || [])].filter((sibling) => revealItems.includes(sibling));
+        const siblingIndex = siblings.indexOf(item);
+        item.style.setProperty('--motion-delay', `${Math.min(Math.max(siblingIndex, 0) * 70, 280)}ms`);
+    });
+
+    if ('IntersectionObserver' in window) {
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+            });
+        }, {
+            rootMargin: '0px 0px -8% 0px',
+            threshold: 0.12,
+        });
+
+        revealItems.forEach((item) => revealObserver.observe(item));
+    } else {
+        revealItems.forEach((item) => item.classList.add('is-visible'));
+    }
+}

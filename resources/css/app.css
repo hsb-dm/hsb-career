@@ -3621,3 +3621,38 @@ h1 span {
 .application-success a {
     color: #a7cb19;
 }
+
+.motion-enabled .motion-item {
+    opacity: 0;
+    transition:
+        opacity .7s cubic-bezier(.22, 1, .36, 1) var(--motion-delay, 0ms),
+        transform .8s cubic-bezier(.22, 1, .36, 1) var(--motion-delay, 0ms);
+    will-change: opacity, transform;
+}
+
+.motion-enabled .motion-entrance,
+.motion-enabled .motion-reveal {
+    transform: translate3d(0, 28px, 0);
+}
+
+.motion-enabled .site-header.motion-entrance {
+    transform: translate3d(0, -18px, 0);
+}
+
+.motion-enabled .hero-image.motion-entrance {
+    transform: translate3d(0, 18px, 0) scale(.975);
+}
+
+.motion-enabled .motion-item.is-visible {
+    opacity: 1;
+    transform: none;
+    will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .motion-enabled .motion-item {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
