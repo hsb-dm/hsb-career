@@ -27,9 +27,9 @@ docker compose --env-file .env.production -f compose.production.yaml run --rm ap
 docker compose --env-file .env.production -f compose.production.yaml up -d app web
 ```
 
-Check `http://127.0.0.1:8080/up` and the home page. A Cloudflare Tunnel running on the same host can use **`http://127.0.0.1:8080`** as its origin service. The Tunnel uses local HTTP while visitors use the HTTPS hostname configured in `APP_URL`. Make sure the public hostname forwarded by the Tunnel matches the hostname in `APP_URL`.
+Check `http://127.0.0.1:8181/up` and the home page. A Cloudflare Tunnel running on the same host can use **`http://127.0.0.1:8181`** as its origin service. The Tunnel uses local HTTP while visitors use the HTTPS hostname configured in `APP_URL`. Make sure the public hostname forwarded by the Tunnel matches the hostname in `APP_URL`.
 
-Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8080`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
+Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8181`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
 
 ## Updates
 

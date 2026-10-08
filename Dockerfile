@@ -54,4 +54,4 @@ CMD ["php-fpm", "-F"]
 FROM nginxinc/nginx-unprivileged:stable-alpine AS web
 COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=app /var/www/html/public /var/www/html/public
-EXPOSE 8080
+EXPOSE 8181
