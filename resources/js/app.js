@@ -373,8 +373,8 @@ if (!reducedPageMotion.matches) {
                 observer.unobserve(entry.target);
             });
         }, {
-            rootMargin: '0px 0px -8% 0px',
-            threshold: 0.12,
+            rootMargin: '0px 0px -4% 0px',
+            threshold: 0.01,
         });
 
         revealItems.forEach((item) => revealObserver.observe(item));
