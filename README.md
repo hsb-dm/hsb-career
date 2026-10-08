@@ -28,6 +28,8 @@ Dashboard tersedia di:
 http://127.0.0.1:8000/admin
 ```
 
+Untuk deployment Docker production melalui Cloudflare Tunnel, lihat [PRODUCTION.md](PRODUCTION.md).
+
 Untuk membagikan aplikasi lokal melalui ngrok, gunakan asset hasil build. Hentikan `npm run dev` / `php artisan dev`, lalu jalankan:
 
 ```bash

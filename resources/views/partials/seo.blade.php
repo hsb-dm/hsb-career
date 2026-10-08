@@ -1,3 +1,4 @@
+@include('partials.favicons')
 <meta name="description" content="{{ $description }}">
 <link rel="canonical" href="{{ $canonical }}">
 <meta property="og:type" content="{{ $type ?? 'website' }}">

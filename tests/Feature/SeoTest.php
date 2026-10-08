@@ -13,6 +13,7 @@ test('public pages expose canonical and sharing metadata', function () {
     $this->get(route('home'))
         ->assertOk()
         ->assertSee('<link rel="canonical" href="'.route('home').'">', false)
+        ->assertSee('<link rel="icon" type="image/svg+xml" href="'.asset('favicon.svg').'">', false)
         ->assertSee('<meta property="og:title" content="Careers at HSB Investasi">', false);
 
     $this->get(route('vacancies.index', ['q' => 'SEO']))

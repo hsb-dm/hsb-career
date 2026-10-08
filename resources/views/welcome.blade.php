@@ -24,13 +24,13 @@
     @include('partials.header')
 
     <main>
-        <section class="hero section-black" aria-labelledby="hero-title">
+        <section class="hero home-hero section-black" aria-labelledby="hero-title">
             <div class="hero-top container">
                 <aside class="hero-fraud-warning" role="status" id="hero-fraud-warning">
-                    <p>Waspada penipuan yang mengatasnamakan HSB. <a
+                    <p>Beware of fraud in the name of HSB. <a
                             href="https://www.hsb.co.id/fraud-warning#pengumuman" target="_blank"
-                            rel="noopener noreferrer">Klik di sini untuk melihat klarifikasi lengkapnya.</a></p>
-                    <button type="button" aria-label="Tutup peringatan penipuan"
+                            rel="noopener noreferrer">Click here to see the full clarification.</a></p>
+                    <button type="button" aria-label="Close fraud warning"
                         onclick="this.closest('#hero-fraud-warning').remove()"><svg width="12" height="12"
                             viewBox="0 0 12 12" fill="none" aria-hidden="true">
                             <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.25"
@@ -156,7 +156,7 @@
             <div class="container">
                 <h2 class="section-title" id="benefits-title">WHAT COMES<br>WITH <span>THE ROLE</span></h2>
                 <p class="section-intro">We support your growth with competitive benefits, a great environment,<br>and
-                    exclusive perks rewarding top performance.</p>
+                    exclusive trips rewarding top performance.</p>
                 <div class="benefits-grid">
                     @foreach ([['PROFESSIONAL GROWTH', 'Access courses, certifications, and training to build skills that move your career forward.'], ['CAREER DEVELOPMENT PROGRAM', 'Grow your skills through our Specialist Program and unlock new opportunities within your career.'], ['PERFORMANCE INCENTIVE & REWARD SCHEME', 'Get recognized and rewarded for the impact you make with bonuses, trips, events, and more.'], ['TEAM EVENTS & ENGAGEMENTS', 'Connect, collaborate, and have fun through team events, sports, and celebrations.'], ['FREEFLOW SNACKS & COFFEE', 'The pantry is always stocked. Fuel your focus whenever you need it.']] as [$name, $description])
                         <article class="benefit-card">
@@ -169,35 +169,40 @@
 
         <section class="life section-deep" id="life" aria-labelledby="life-title">
             <div class="container">
-                <h2 class="section-title" id="life-title">GET A <span>GLIMPSE</span> OF LIFE AT HSB</h2>
-                <div class="gallery-wrap">
-                    <button class="gallery-arrow gallery-prev" type="button" aria-label="Previous photos">
-                        <svg aria-hidden="true" width="14" height="22" viewBox="0 0 14 22" fill="none">
-                            <path d="M11 2 3 11l8 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
-                    <div class="gallery-track swiper" data-gallery aria-label="Photos of life at HSB">
-                        <div class="swiper-wrapper">
-                            @foreach ([
-                                ['Frame 10000135022.png', 'HSB team on a trip'],
-                                ['Frame 1000013498.png', 'HSB team gathering in the office'],
-                                ['Frame 1000013499.png', 'HSB team playing football'],
-                                ['Frame 1000013500.png', 'HSB team playing padel'],
-                                ['Frame 1000013501.png', 'HSB team at a company event'],
-                            ] as [$file, $alt])
-                                <figure class="gallery-item swiper-slide">
-                                    <img src="{{ asset('images/home/slider/' . $file) }}" alt="{{ $alt }}" width="573" height="573" loading="lazy">
-                                </figure>
-                            @endforeach
-                        </div>
+                <h2 class="section-title" id="life-title">GET A <span>GLIMPSE</span><br class="life-mobile-break"> OF LIFE AT HSB</h2>
+                @php
+                    $lifeCategories = [
+                        ['slug' => 'sport', 'label' => 'Sport Day'],
+                        ['slug' => 'birthday', 'label' => 'Birthday Celebration'],
+                        ['slug' => 'special', 'label' => 'Special Day Celebration'],
+                        ['slug' => 'reward-trip', 'label' => 'BD Reward Trip'],
+                    ];
+                    $lifeImageIds = ['3498', '3499', '3500', '3501'];
+                @endphp
+                <div class="life-gallery" data-life-gallery>
+                    <div class="life-tabs" role="tablist" aria-label="Life at HSB categories">
+                        @foreach ($lifeCategories as $category)
+                            <button class="life-tab" type="button" role="tab"
+                                id="life-tab-{{ $category['slug'] }}"
+                                aria-controls="life-panel-{{ $category['slug'] }}"
+                                aria-selected="{{ $loop->first ? 'true' : 'false' }}"
+                                tabindex="{{ $loop->first ? '0' : '-1' }}">{{ $category['label'] }}</button>
+                        @endforeach
                     </div>
-                    <button class="gallery-arrow gallery-next" type="button" aria-label="Next photos">
-                        <svg aria-hidden="true" width="14" height="22" viewBox="0 0 14 22" fill="none">
-                            <path d="m3 2 8 9-8 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </button>
+                    <div class="life-panels">
+                        @foreach ($lifeCategories as $category)
+                            <div class="life-panel {{ $loop->first ? 'is-active' : '' }}"
+                                id="life-panel-{{ $category['slug'] }}" role="tabpanel"
+                                aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (! $loop->first) hidden @endif>
+                                @foreach ($lifeImageIds as $imageId)
+                                    <img src="{{ asset('images/home/slider/'.$category['slug'].'/Frame 100001'.$imageId.'.webp') }}"
+                                        alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
+                                        width="573" height="573" loading="lazy" decoding="async">
+                                @endforeach
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
-                <div class="gallery-pagination" aria-label="Photo slider pages"></div>
             </div>
         </section>
 
@@ -209,18 +214,13 @@
                     <article class="job-card"
                         data-title="{{ strtolower($job->title . ' ' . $job->department . ' ' . $job->location) }}"
                         data-type="{{ $job->employment_type->value }}">
-                        <div>
+                        <div class="job-card-main">
                             <h3>{{ $job->title }}</h3>
-                            <p>{{ $job->department }} <span>•</span> {{ $job->employment_type->label() }} <span>•</span>
-                                <span class="job-location"><svg aria-hidden="true" width="24" height="24"
-                                        viewBox="0 0 24 24" fill="none">
-                                        <path d="M12 13C13.6569 13 15 11.6569 15 10C15 8.34315 13.6569 7 12 7C10.3431 7 9 8.34315 9 10C9 11.6569 10.3431 13 12 13Z"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                        <path d="M6.34315 4.34315C7.84344 2.84285 9.87827 2 12 2C14.1217 2 16.1566 2.84285 17.6569 4.34315C19.1571 5.84344 20 7.87827 20 10C20 11.892 19.598 13.13 18.5 14.5L12 22L5.5 14.5C4.402 13.13 4 11.892 4 10C4 7.87827 4.84285 5.84344 6.34315 4.34315Z"
-                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                            stroke-linejoin="round" />
-                                    </svg>{{ $job->location }}</span></p>
+                            <ul class="job-card-details">
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->department }}</li>
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M5 21v-2a7 7 0 0 1 14 0v2H5Z" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->employment_type->label() }}</li>
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22s8-7.3 8-14a8 8 0 1 0-16 0c0 6.7 8 14 8 14Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="8" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->location }}</li>
+                            </ul>
                         </div><a class="button button-lime button-small"
                             href="{{ route('vacancies.show', $job->slug) }}">Apply
                             Now <svg class="button-arrow" width="20" height="20" viewBox="0 0 28 28" fill="none"

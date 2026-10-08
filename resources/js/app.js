@@ -1,25 +1,89 @@
-import 'swiper/css';
-
 const search = document.querySelector('#job-search');
 const typeFilter = document.querySelector('#job-type-filter');
 const jobFilters = document.querySelector('[data-job-filters]');
 const isVacanciesPage = jobFilters?.dataset.page === 'vacancies';
 const jobCards = [...document.querySelectorAll('.job-card')];
 const filterEmpty = document.querySelector('#job-filter-empty');
+const seeMoreJobs = document.querySelector('[data-see-more-jobs]');
+const jobsPerPage = 9;
+let shownJobs = jobsPerPage;
+
+const mobileNav = document.querySelector('[data-mobile-nav]');
+const mobileNavOpen = document.querySelector('[data-mobile-nav-open]');
+const mobileNavClose = document.querySelector('[data-mobile-nav-close]');
+
+if (mobileNav && mobileNavOpen && mobileNavClose) {
+    const mobileViewport = window.matchMedia('(max-width: 600px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const firstMobileLink = mobileNav.querySelector('a');
+    let closeTimer;
+
+    function closeNavigation({ restoreFocus = true, immediate = false } = {}) {
+        if (!mobileNav.open) return;
+
+        window.clearTimeout(closeTimer);
+        mobileNav.classList.remove('is-open');
+        mobileNavOpen.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('mobile-nav-open');
+
+        const finishClose = () => {
+            if (mobileNav.open) mobileNav.close();
+            if (restoreFocus) mobileNavOpen.focus();
+        };
+
+        if (immediate || reducedMotion.matches) finishClose();
+        else closeTimer = window.setTimeout(finishClose, 240);
+    }
+
+    mobileNavOpen.addEventListener('click', () => {
+        if (mobileNav.open) {
+            closeNavigation();
+            return;
+        }
+
+        window.clearTimeout(closeTimer);
+        mobileNav.showModal();
+        mobileNavOpen.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('mobile-nav-open');
+        window.requestAnimationFrame(() => mobileNav.classList.add('is-open'));
+        firstMobileLink?.focus();
+    });
+
+    mobileNavClose.addEventListener('click', () => closeNavigation());
+    mobileNav.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        closeNavigation();
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !mobileNav.open) return;
+        event.preventDefault();
+        closeNavigation();
+    });
+    mobileNav.addEventListener('click', (event) => {
+        if (event.target === mobileNav) closeNavigation();
+    });
+    mobileNav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => closeNavigation({ restoreFocus: false }));
+    });
+    mobileViewport.addEventListener('change', (event) => {
+        if (!event.matches) closeNavigation({ restoreFocus: false, immediate: true });
+    });
+}
 
 function filterJobs() {
     if (!isVacanciesPage) return;
     const term = search.value.trim().toLocaleLowerCase();
     const type = typeFilter.value;
-    let visibleCount = 0;
+    let matchingCount = 0;
 
     for (const card of jobCards) {
-        const visible = card.dataset.title.includes(term) && (type === 'all' || card.dataset.type === type);
-        card.hidden = !visible;
-        if (visible) visibleCount++;
+        const matches = card.dataset.title.includes(term) && (type === 'all' || card.dataset.type === type);
+        if (matches) matchingCount++;
+        card.hidden = !matches || matchingCount > shownJobs;
     }
 
-    if (filterEmpty) filterEmpty.hidden = visibleCount !== 0 || jobCards.length === 0;
+    if (filterEmpty) filterEmpty.hidden = matchingCount !== 0 || jobCards.length === 0;
+    if (seeMoreJobs) seeMoreJobs.hidden = matchingCount <= shownJobs;
 
     const url = new URL(window.location.href);
     if (search.value.trim()) url.searchParams.set('q', search.value.trim());
@@ -29,7 +93,14 @@ function filterJobs() {
     window.history.replaceState(null, '', url);
 }
 
-search?.addEventListener('input', filterJobs);
+search?.addEventListener('input', () => {
+    shownJobs = jobsPerPage;
+    filterJobs();
+});
+seeMoreJobs?.addEventListener('click', () => {
+    shownJobs += jobsPerPage;
+    filterJobs();
+});
 if (isVacanciesPage) filterJobs();
 function setupListbox(root, value, label, onChange = () => {}) {
     if (!root) return null;
@@ -92,51 +163,82 @@ setupListbox(
     document.querySelector('[data-job-select]'),
     typeFilter,
     document.querySelector('[data-job-selection]'),
-    filterJobs,
+    () => {
+        shownJobs = jobsPerPage;
+        filterJobs();
+    },
 );
 
-const gallery = document.querySelector('[data-gallery]');
-async function initGallery(gallery) {
-    const [{ default: Swiper }, { A11y, Autoplay, Keyboard, Navigation, Pagination }] = await Promise.all([
-        import('swiper'),
-        import('swiper/modules'),
-    ]);
+const lifeGallery = document.querySelector('[data-life-gallery]');
+if (lifeGallery) {
+    const tabs = [...lifeGallery.querySelectorAll('[role="tab"]')];
+    const panels = tabs.map((tab) => document.getElementById(tab.getAttribute('aria-controls')));
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let activeIndex = 0;
+    let timerId;
 
-    new Swiper(gallery, {
-        modules: [A11y, Autoplay, Keyboard, Navigation, Pagination],
-        initialSlide: 1,
-        loop: true,
-        speed: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650,
-        grabCursor: true,
-        autoplay: {
-            delay: 2500,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-            waitForTransition: true,
-        },
-        slidesPerView: 1,
-        spaceBetween: 14,
-        breakpoints: {
-            601: { slidesPerView: 2 },
-            901: { slidesPerView: 4 },
-        },
-        navigation: {
-            prevEl: '.gallery-prev',
-            nextEl: '.gallery-next',
-        },
-        pagination: {
-            el: '.gallery-pagination',
-            clickable: true,
-            bulletElement: 'button',
-            bulletClass: 'gallery-dot',
-            bulletActiveClass: 'gallery-dot-active',
-        },
-        keyboard: { enabled: true, onlyInViewport: true },
-        a11y: { enabled: true },
+    panels.forEach((panel, index) => {
+        panel.inert = index !== activeIndex;
+        panel.setAttribute('aria-hidden', String(index !== activeIndex));
     });
-}
 
-if (gallery) initGallery(gallery);
+    function selectCategory(index) {
+        activeIndex = index;
+        tabs.forEach((tab, tabIndex) => {
+            const selected = tabIndex === index;
+            const panel = panels[tabIndex];
+            tab.setAttribute('aria-selected', String(selected));
+            tab.tabIndex = selected ? 0 : -1;
+
+            if (selected && panel.hidden) {
+                panel.hidden = false;
+                // Establish the invisible state before the first fade-in.
+                void panel.offsetWidth;
+            }
+
+            panel.classList.toggle('is-active', selected);
+            panel.inert = !selected;
+            panel.setAttribute('aria-hidden', String(!selected));
+        });
+    }
+
+    function restartRotation() {
+        clearInterval(timerId);
+        if (!reducedMotion.matches && !document.hidden && !lifeGallery.matches(':hover') && !lifeGallery.contains(document.activeElement)) {
+            timerId = window.setInterval(() => selectCategory((activeIndex + 1) % tabs.length), 5000);
+        }
+    }
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            selectCategory(index);
+            restartRotation();
+        });
+
+        tab.addEventListener('keydown', (event) => {
+            const nextIndex = {
+                ArrowRight: (index + 1) % tabs.length,
+                ArrowLeft: (index - 1 + tabs.length) % tabs.length,
+                Home: 0,
+                End: tabs.length - 1,
+            }[event.key];
+
+            if (nextIndex === undefined) return;
+            event.preventDefault();
+            selectCategory(nextIndex);
+            tabs[nextIndex].focus();
+            restartRotation();
+        });
+    });
+
+    document.addEventListener('visibilitychange', restartRotation);
+    reducedMotion.addEventListener('change', restartRotation);
+    lifeGallery.addEventListener('mouseenter', () => clearInterval(timerId));
+    lifeGallery.addEventListener('mouseleave', restartRotation);
+    lifeGallery.addEventListener('focusin', () => clearInterval(timerId));
+    lifeGallery.addEventListener('focusout', () => window.setTimeout(restartRotation, 0));
+    restartRotation();
+}
 
 const talentSelect = document.querySelector('[data-talent-select]');
 if (talentSelect) {

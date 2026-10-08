@@ -58,7 +58,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body>
+<body class="vacancy-detail-screen">
     @include('partials.header')
 
     <main class="vacancy-detail-page">

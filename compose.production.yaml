@@ -1,0 +1,88 @@
+name: hsb-jobs-production
+
+services:
+  app:
+    build:
+      context: .
+      target: app
+    restart: unless-stopped
+    env_file: ${APP_ENV_FILE:-.env.production}
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_ROOT_PASSWORD: ""
+      LOG_CHANNEL: stderr
+      LOG_LEVEL: warning
+      SESSION_SECURE_COOKIE: "true"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - cv-data:/var/www/html/storage/app/private
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=64m
+      - /var/www/html/storage/framework:rw,noexec,nosuid,size=64m,uid=82,gid=82
+      - /var/www/html/storage/logs:rw,noexec,nosuid,size=16m,uid=82,gid=82
+      - /var/www/html/bootstrap/cache:rw,noexec,nosuid,size=16m,uid=82,gid=82
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - frontend
+      - backend
+
+  web:
+    build:
+      context: .
+      target: web
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "${APP_BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+      - /var/cache/nginx:rw,noexec,nosuid,size=32m
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/up"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    networks:
+      - frontend
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:?Set DB_DATABASE in .env.production}"
+      MYSQL_USER: "${DB_USERNAME:?Set DB_USERNAME in .env.production}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:?Set DB_PASSWORD in .env.production}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:?Set DB_ROOT_PASSWORD in .env.production}"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_PASSWORD}\" mysql -h 127.0.0.1 -u \"$${MYSQL_USER}\" \"$${MYSQL_DATABASE}\" -e 'SELECT 1' >/dev/null 2>&1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - backend
+
+networks:
+  frontend:
+  backend:
+    internal: true
+
+volumes:
+  mysql-data:
+  cv-data:

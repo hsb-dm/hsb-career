@@ -15,8 +15,8 @@
                     </svg></a>
             </div>
         @else
-            <h2 class="section-title" id="talent-title">DON’T SEE <span>YOUR ROLE</span> YET?</h2>
-            <p class="talent-intro">We're growing fast and new roles open regularly.<br>Leave your details and we'll
+            <h2 class="section-title" id="talent-title">DON’T SEE<br class="talent-mobile-break"> <span>YOUR ROLE</span> YET?</h2>
+            <p class="talent-intro">We're growing fast and new roles open regularly. Leave your details and we'll
                 reach out when something that fits comes up.</p>
             <form class="talent-form" action="{{ route('talent-pool.store') }}" method="POST"
                 enctype="multipart/form-data" aria-label="Join our talent pool">

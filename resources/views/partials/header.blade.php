@@ -8,10 +8,34 @@
         </a>
 
         <nav class="header-actions" aria-label="Main navigation">
-            <a href="{{ request()->routeIs('home') ? '#about' : route('home') . '#about' }}">About Us</a>
-            <a href="https://www.hsb.co.id/contact">Contact us</a>
-            <a href="https://blog.hsb.co.id/">Media Info</a>
-            <a href="{{ request()->routeIs('home') ? '#awards-title' : route('home') . '#awards-title' }}">Awards</a>
+            <a href="https://www.hsb.co.id/about" target="_blank" rel="noopener noreferrer">About Us</a>
+            <a href="https://www.hsb.co.id/contact" target="_blank" rel="noopener noreferrer">Contact us</a>
+            <a href="https://www.hsb.co.id/newsroom" target="_blank" rel="noopener noreferrer">Media Info</a>
+            <a href="https://www.hsb.co.id/newsroom/awards" target="_blank" rel="noopener noreferrer">Awards</a>
         </nav>
+
+        <button class="header-menu-toggle" type="button" aria-label="Open navigation menu"
+            aria-controls="mobile-navigation" aria-expanded="false" data-mobile-nav-open>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </button>
     </div>
+
+    <dialog class="mobile-nav-drawer" id="mobile-navigation" aria-label="Mobile navigation" data-mobile-nav>
+        <div class="mobile-nav-heading">
+            <span>Menu</span>
+            <button class="mobile-nav-close" type="button" aria-label="Close navigation menu" data-mobile-nav-close>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M5 5 19 19M19 5 5 19" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                </svg>
+            </button>
+        </div>
+        <nav class="mobile-nav-links" aria-label="Mobile navigation links">
+            <a href="https://www.hsb.co.id/about" target="_blank" rel="noopener noreferrer">About Us</a>
+            <a href="https://www.hsb.co.id/contact" target="_blank" rel="noopener noreferrer">Contact us</a>
+            <a href="https://www.hsb.co.id/newsroom" target="_blank" rel="noopener noreferrer">Media Info</a>
+            <a href="https://www.hsb.co.id/newsroom/awards" target="_blank" rel="noopener noreferrer">Awards</a>
+        </nav>
+    </dialog>
 </header>

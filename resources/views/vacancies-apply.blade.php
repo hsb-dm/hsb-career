@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#080909">
     <title>Apply for {{ $job->title }} | Careers at HSB Investasi</title>
+    @include('partials.favicons')
     <meta name="robots" content="noindex, follow">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

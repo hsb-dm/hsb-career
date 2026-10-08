@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->brandName('HSB Recruitment')
+            ->favicon(asset('favicon.svg'))
             ->colors([
                 'primary' => Color::hex('#1b39e6'),
             ])

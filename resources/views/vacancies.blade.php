@@ -24,10 +24,10 @@
         <section class="hero vacancies-hero section-black" aria-labelledby="vacancies-hero-title">
             <div class="hero-top container">
                 <aside class="hero-fraud-warning" role="status" id="hero-fraud-warning">
-                    <p>Waspada penipuan yang mengatasnamakan HSB. <a
+                    <p>Beware of fraud in the name of HSB. <a
                             href="https://www.hsb.co.id/fraud-warning#pengumuman" target="_blank"
-                            rel="noopener noreferrer">Klik di sini untuk melihat klarifikasi lengkapnya.</a></p>
-                    <button type="button" aria-label="Tutup peringatan penipuan"
+                            rel="noopener noreferrer">Click here to see the full clarification.</a></p>
+                    <button type="button" aria-label="Close fraud warning"
                         onclick="this.closest('#hero-fraud-warning').remove()"><svg width="12" height="12"
                             viewBox="0 0 12 12" fill="none" aria-hidden="true">
                             <path d="M2 2L10 10M10 2L2 10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" />
@@ -74,6 +74,9 @@
                     @endforelse
                     <p class="jobs-empty" id="job-filter-empty" hidden>No roles match your search.</p>
                 </div>
+                @if ($jobs->count() > 9)
+                    <button class="button button-lime vacancies-see-more" type="button" data-see-more-jobs hidden>See More</button>
+                @endif
             </div>
         </section>
         @include('partials.talent-pool')

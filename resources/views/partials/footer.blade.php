@@ -75,7 +75,7 @@
 @if ($showAwards ?? true)
 <section class="awards-strip" aria-labelledby="awards-title">
     <div class="container awards-inner">
-        <h2 id="awards-title">Memenangkan<br>Berbagai Macam<br>Penghargaan</h2>
+        <h2 id="awards-title">Memenangkan<br class="awards-desktop-break"> Berbagai<br class="awards-mobile-break"> Macam<br class="awards-desktop-break"> Penghargaan</h2>
         <ul class="award-items" role="list">
             @foreach ($awards as [$year, $title])
                 <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt="{{ $title }}" width="307" height="140" loading="lazy"></li>
