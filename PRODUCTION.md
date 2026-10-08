@@ -1,24 +1,24 @@
-# Deploy production lewat Cloudflare Tunnel
+# Production deployment through Cloudflare Tunnel
 
-Stack production menggunakan PHP-FPM, Nginx, dan MySQL 8.4. Hanya Nginx yang membuka port host. MySQL tidak dipublikasikan; CV dan database memakai volume Docker agar tetap ada saat container dibuat ulang.
+The production stack uses PHP-FPM, Nginx, and MySQL 8.4. Only Nginx publishes a host port. MySQL is not exposed, and Docker volumes preserve the database and CV files when containers are replaced.
 
-## Persiapan
+## Preparation
 
 ```bash
 cp .env.production.example .env.production
 ```
 
-Isi `APP_URL` dengan hostname HTTPS Tunnel, lalu ganti `DB_PASSWORD` dan `DB_ROOT_PASSWORD` dengan dua password acak yang berbeda. Buat `APP_KEY` satu kali dan simpan nilainya di `.env.production`:
+Set `APP_URL` to the Tunnel HTTPS hostname, then replace `DB_PASSWORD` and `DB_ROOT_PASSWORD` with two different random passwords. Generate `APP_KEY` once and store it in `.env.production`:
 
 ```bash
 php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'
 ```
 
-Jangan ganti `APP_KEY` setelah ada data pengguna: sesi dan data terenkripsi lama dapat menjadi tidak terbaca. Simpan salinan aman `.env.production`, serta cadangkan volume `mysql-data` dan `cv-data` secara berkala. File `.env.production` tidak masuk Git maupun image Docker.
+Do not change `APP_KEY` after user data exists because existing sessions and encrypted data may become unreadable. Keep a secure copy of `.env.production` and regularly back up the `mysql-data` and `cv-data` volumes. `.env.production` is excluded from Git and the Docker images.
 
-## Jalankan
+## Start the stack
 
-Jalankan semua perintah dari direktori repo:
+Run all commands from the repository directory:
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml build
@@ -27,11 +27,11 @@ docker compose --env-file .env.production -f compose.production.yaml run --rm ap
 docker compose --env-file .env.production -f compose.production.yaml up -d app web
 ```
 
-Periksa `http://127.0.0.1:8080/up` dan halaman utama. Cloudflare Tunnel yang berjalan di host yang sama dapat diarahkan ke **`http://127.0.0.1:8080`**. URL layanan Tunnel memakai HTTP lokal; pengunjung tetap memakai hostname HTTPS pada `APP_URL`. Pastikan hostname publik yang dikirim Tunnel sama dengan hostname `APP_URL`.
+Check `http://127.0.0.1:8080/up` and the home page. A Cloudflare Tunnel running on the same host can use **`http://127.0.0.1:8080`** as its origin service. The Tunnel uses local HTTP while visitors use the HTTPS hostname configured in `APP_URL`. Make sure the public hostname forwarded by the Tunnel matches the hostname in `APP_URL`.
 
-Port host dapat diganti lewat `APP_PORT` di `.env.production`. Default `APP_BIND_ADDRESS=127.0.0.1` membuat origin hanya dapat diakses dari host itu. Jika `cloudflared` berjalan di container, hubungkan ke jaringan Docker `hsb-jobs-production_frontend` dan arahkan ke `http://web:8080`. Jika Tunnel berada di host lain, atur `APP_BIND_ADDRESS` ke alamat jaringan yang dapat dicapai Tunnel dan batasi akses jaringan ke port tersebut.
+Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8080`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
 
-## Pembaruan
+## Updates
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml build
@@ -39,11 +39,11 @@ docker compose --env-file .env.production -f compose.production.yaml run --rm ap
 docker compose --env-file .env.production -f compose.production.yaml up -d app web
 ```
 
-Jangan jalankan `migrate:fresh` atau seeder demo di production. Untuk melihat status dan log:
+Do not run `migrate:fresh` or the demo seeder in production. To inspect status and logs:
 
 ```bash
 docker compose --env-file .env.production -f compose.production.yaml ps
 docker compose --env-file .env.production -f compose.production.yaml logs -f app web mysql
 ```
 
-Image menggunakan build bertahap sehingga Node, Composer, dependency development, dan source test tidak masuk image runtime. PHP OPcache dan cache Laravel aktif saat startup. Aplikasi berjalan sebagai user non-root dengan filesystem kode read-only; direktori runtime memakai tmpfs, dan hanya CV yang memakai volume persisten. Nginx melayani aset statis dengan cache browser dan membatasi eksekusi PHP ke `public/index.php`.
+The images use multi-stage builds, keeping Node, Composer, development dependencies, and test sources out of the runtime images. PHP OPcache and Laravel caches are enabled at startup. The application runs as a non-root user with a read-only code filesystem. Runtime directories use tmpfs, while CV files use a persistent volume. Nginx serves static assets with browser caching and restricts PHP execution to `public/index.php`.

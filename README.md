@@ -1,13 +1,13 @@
 # HSB HR Dashboard
 
-MVP dashboard internal untuk HR mengelola lowongan dan applicant menggunakan Laravel, Filament, Livewire, Blade, dan MySQL.
+An internal HR dashboard for managing job vacancies and applicants, built with Laravel, Filament, Livewire, Blade, and MySQL.
 
 ## Requirements
 
 - PHP 8.4+
 - Composer
-- Node.js dan npm
-- Docker untuk MySQL lokal, atau MySQL 8 yang sudah tersedia
+- Node.js and npm
+- Docker for a local MySQL instance, or an existing MySQL 8 installation
 
 ## Setup
 
@@ -22,22 +22,22 @@ npm run build
 php artisan serve
 ```
 
-Dashboard tersedia di:
+The dashboard is available at:
 
 ```text
 http://127.0.0.1:8000/admin
 ```
 
-Untuk deployment Docker production melalui Cloudflare Tunnel, lihat [PRODUCTION.md](PRODUCTION.md).
+For production deployment with Docker and Cloudflare Tunnel, see [PRODUCTION.md](PRODUCTION.md).
 
-Untuk membagikan aplikasi lokal melalui ngrok, gunakan asset hasil build. Hentikan `npm run dev` / `php artisan dev`, lalu jalankan:
+To share the local application through ngrok, use the compiled assets. Stop `npm run dev` or `php artisan dev`, then run:
 
 ```bash
 npm run build
 rm -f public/hot
 ```
 
-Jalankan server dan ngrok di dua terminal terpisah:
+Run the server and ngrok in separate terminals:
 
 ```bash
 php artisan serve
@@ -47,7 +47,7 @@ php artisan serve
 ngrok http 8000
 ```
 
-File `public/hot` membuat Laravel mengambil CSS/JS dari Vite di `localhost:5173`, yang tidak dapat diakses pengunjung melalui ngrok. Aplikasi lokal mempercayai header HTTPS hanya dari proxy loopback agar URL asset yang dihasilkan memakai `https://`.
+When `public/hot` exists, Laravel loads CSS and JavaScript from Vite at `localhost:5173`, which visitors cannot access through ngrok. The local application trusts HTTPS headers only from loopback proxies so generated asset URLs use `https://`.
 
 Development credentials:
 
@@ -56,11 +56,11 @@ Email: admin@example.com
 Password: password
 ```
 
-Credential ini hanya untuk development dan dibuat melalui database seeder.
+These credentials are for development only and are created by the database seeder.
 
 ## Database
 
-Default `.env.example` menggunakan MySQL:
+The default `.env.example` configuration uses MySQL:
 
 ```env
 DB_CONNECTION=mysql
@@ -71,24 +71,24 @@ DB_USERNAME=hsb_jobs
 DB_PASSWORD=secret
 ```
 
-`docker-compose.yml` hanya menjalankan MySQL 8.4 dengan persistent volume `mysql-data`.
+`docker-compose.yml` runs MySQL 8.4 with the persistent `mysql-data` volume.
 
 ## Storage
 
-CV disimpan di disk `local`, yaitu `storage/app/private`, sehingga file tidak diekspos sebagai public URL permanen.
+CV files are stored on the `local` disk at `storage/app/private`, so they are not exposed through permanent public URLs.
 
-Seeder menyediakan satu dummy CV fisik di:
+The seeder creates one sample CV file at:
 
 ```text
 storage/app/private/cvs/sample-cv.pdf
 ```
 
-Beberapa applicant sengaja memakai dummy path yang tidak ada untuk menguji empty state. Tidak perlu menjalankan `php artisan storage:link` untuk MVP ini.
+Some applicants intentionally reference missing sample paths to exercise the empty state. This application does not require `php artisan storage:link`.
 
 ## Features
 
-- Filament admin panel di `/admin`
-- Authentication bawaan Filament
+- Filament admin panel at `/admin`
+- Filament authentication
 - Jobs resource:
   - create, view, edit, delete
   - duplicate job
@@ -99,8 +99,8 @@ Beberapa applicant sengaja memakai dummy path yang tidak ada untuk menguji empty
   - status quick actions
   - bulk update status
   - CV upload/download private storage
-  - PDF preview jika file tersedia
-  - salary formatting sebagai Rupiah
+  - PDF preview when the file is available
+  - salary formatting in Indonesian Rupiah
 - Dashboard widgets:
   - total active jobs
   - total applicants
@@ -122,7 +122,7 @@ php artisan test
 composer test
 ```
 
-`composer test` juga menjalankan Pint dan PHPStan sesuai script project.
+`composer test` also runs Pint and PHPStan through the project scripts.
 
 ## Deliberately Not Included
 
@@ -140,4 +140,4 @@ composer test
 - Full audit log
 - Multi-company or multi-tenant support
 
-CSV export dilewati di MVP ini karena tidak diperlukan untuk dashboard-first flow dan akan menambah surface area yang belum penting.
+CSV export is excluded because it is not required by the dashboard workflow.

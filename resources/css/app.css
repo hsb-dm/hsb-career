@@ -1,7 +1,6 @@
 @import 'tailwindcss';
 @import '../../tokens.css';
 
-/* Hallmark · pre-emit critique: P5 H5 E5 S5 R5 V4 */
 @source '../views';
 
 @font-face {
@@ -52,7 +51,6 @@
     font-display: swap;
 }
 
-/* Hallmark · macrostructure: editorial careers landing · source: supplied screenshot */
 * {
     box-sizing: border-box;
 }

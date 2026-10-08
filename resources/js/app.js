@@ -192,7 +192,6 @@ if (lifeGallery) {
 
             if (selected && panel.hidden) {
                 panel.hidden = false;
-                // Establish the invisible state before the first fade-in.
                 void panel.offsetWidth;
             }
 
