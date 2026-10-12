@@ -22,7 +22,7 @@ class VacancyController extends Controller
     public function show(string $slug): View
     {
         return view('vacancies-show', [
-            'job' => Job::query()->active()->where('slug', $slug)->firstOrFail(),
+            'job' => Job::query()->where('slug', $slug)->firstOrFail(),
         ]);
     }
 

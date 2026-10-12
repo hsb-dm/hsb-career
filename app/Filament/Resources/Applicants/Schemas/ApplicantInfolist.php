@@ -72,7 +72,6 @@ class ApplicantInfolist
                     ->schema([
                         TextEntry::make('latest_company_reference')->label('Latest Company')->placeholder('-'),
                         TextEntry::make('second_latest_company_reference')->label('2nd Latest Company')->placeholder('-'),
-                        TextEntry::make('third_latest_company_reference')->label('3rd Latest Company')->placeholder('-'),
                     ]),
                 Section::make('Health')
                     ->schema([

@@ -37,7 +37,6 @@ class ScreeningForm
             'Reference checks' => [
                 'latest_company_reference' => ['label' => 'Reference Check Contact Details From Latest Company (Name, Position, Phone/Email)', 'type' => 'textarea', 'required' => true],
                 'second_latest_company_reference' => ['label' => 'Reference Check Contact Details From 2nd Latest Company (Name, Position, Phone/Email) (If any)', 'type' => 'textarea'],
-                'third_latest_company_reference' => ['label' => 'Reference Check Contact Details From 3rd Latest Company (Name, Position, Phone/Email) (If any)', 'type' => 'textarea'],
             ],
             'Health' => [
                 'serious_disease' => ['label' => 'Have you ever been diagnosed with any serious disease?', 'type' => 'select', 'required' => true, 'options' => ['yes' => 'Yes', 'no' => 'No']],

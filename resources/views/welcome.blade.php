@@ -27,9 +27,8 @@
         <section class="hero home-hero section-black" aria-labelledby="hero-title">
             <div class="hero-top container">
                 <aside class="hero-fraud-warning" role="status" id="hero-fraud-warning">
-                    <p>Beware of fraud in the name of HSB. <a
-                            href="https://www.hsb.co.id/fraud-warning#pengumuman" target="_blank"
-                            rel="noopener noreferrer">Click here to see the full clarification.</a></p>
+                    <p>Beware of fraud in the name of HSB. <a href="https://www.hsb.co.id/fraud-warning#pengumuman"
+                            target="_blank" rel="noopener noreferrer">Click here to see the full clarification.</a></p>
                     <button type="button" aria-label="Close fraud warning"
                         onclick="this.closest('#hero-fraud-warning').remove()"><svg width="12" height="12"
                             viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -155,8 +154,9 @@
         <section class="benefits section-dark" id="benefits" aria-labelledby="benefits-title">
             <div class="container">
                 <h2 class="section-title" id="benefits-title">WHAT COMES<br>WITH <span>THE ROLE</span></h2>
-                <p class="section-intro">We support your growth with competitive benefits, a great environment,<br>and
-                    exclusive trips rewarding top performance.</p>
+                <p class="section-intro">We support your growth with competitive benefits, a great environment, and
+                    exclusive rewards for top performance.
+                </p>
                 <div class="benefits-grid">
                     @foreach ([['PROFESSIONAL GROWTH', 'Access courses, certifications, and training to build skills that move your career forward.'], ['CAREER DEVELOPMENT PROGRAM', 'Grow your skills through our Specialist Program and unlock new opportunities within your career.'], ['PERFORMANCE INCENTIVE & REWARD SCHEME', 'Get recognized and rewarded for the impact you make with bonuses, trips, events, and more.'], ['TEAM EVENTS & ENGAGEMENTS', 'Connect, collaborate, and have fun through team events, sports, and celebrations.'], ['FREEFLOW SNACKS & COFFEE', 'The pantry is always stocked. Fuel your focus whenever you need it.']] as [$name, $description])
                         <article class="benefit-card">
@@ -169,7 +169,8 @@
 
         <section class="life section-deep" id="life" aria-labelledby="life-title">
             <div class="container">
-                <h2 class="section-title" id="life-title">GET A <span>GLIMPSE</span><br class="life-mobile-break"> OF LIFE AT HSB</h2>
+                <h2 class="section-title" id="life-title">GET A <span>GLIMPSE</span><br class="life-mobile-break"> OF
+                    LIFE AT HSB</h2>
                 @php
                     $lifeCategories = [
                         ['slug' => 'sport', 'label' => 'Sport Day'],
@@ -182,8 +183,7 @@
                 <div class="life-gallery" data-life-gallery>
                     <div class="life-tabs" role="tablist" aria-label="Life at HSB categories">
                         @foreach ($lifeCategories as $category)
-                            <button class="life-tab" type="button" role="tab"
-                                id="life-tab-{{ $category['slug'] }}"
+                            <button class="life-tab" type="button" role="tab" id="life-tab-{{ $category['slug'] }}"
                                 aria-controls="life-panel-{{ $category['slug'] }}"
                                 aria-selected="{{ $loop->first ? 'true' : 'false' }}"
                                 tabindex="{{ $loop->first ? '0' : '-1' }}">{{ $category['label'] }}</button>
@@ -193,9 +193,10 @@
                         @foreach ($lifeCategories as $category)
                             <div class="life-panel {{ $loop->first ? 'is-active' : '' }}"
                                 id="life-panel-{{ $category['slug'] }}" role="tabpanel"
-                                aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (! $loop->first) hidden @endif>
+                                aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (!$loop->first) hidden
+                                @endif>
                                 @foreach ($lifeImageIds as $imageId)
-                                    <img src="{{ asset('images/home/slider/'.$category['slug'].'/Frame 100001'.$imageId.'.webp') }}"
+                                    <img src="{{ asset('images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp') }}"
                                         alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
                                         width="573" height="573" loading="lazy" decoding="async">
                                 @endforeach
@@ -217,24 +218,42 @@
                         <div class="job-card-main">
                             <h3>{{ $job->title }}</h3>
                             <ul class="job-card-details">
-                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="7" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->department }}</li>
-                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M5 21v-2a7 7 0 0 1 14 0v2H5Z" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->employment_type->label() }}</li>
-                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22s8-7.3 8-14a8 8 0 1 0-16 0c0 6.7 8 14 8 14Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="8" r="2.5" stroke="currentColor" stroke-width="1.8"/></svg>{{ $job->location }}</li>
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <rect x="3" y="7" width="18" height="14" rx="2" stroke="currentColor"
+                                            stroke-width="1.8" />
+                                        <path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor"
+                                            stroke-width="1.8" />
+                                    </svg>{{ $job->department }}</li>
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <circle cx="12" cy="7" r="3" stroke="currentColor" stroke-width="1.8" />
+                                        <path d="M5 21v-2a7 7 0 0 1 14 0v2H5Z" stroke="currentColor"
+                                            stroke-width="1.8" />
+                                    </svg>{{ $job->employment_type->label() }}</li>
+                                <li><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                                        <path d="M12 22s8-7.3 8-14a8 8 0 1 0-16 0c0 6.7 8 14 8 14Z"
+                                            stroke="currentColor" stroke-width="1.8" />
+                                        <circle cx="12" cy="8" r="2.5" stroke="currentColor" stroke-width="1.8" />
+                                    </svg>{{ $job->location }}</li>
                             </ul>
                         </div><a class="button button-lime button-small"
                             href="{{ route('vacancies.show', $job->slug) }}">Apply
                             Now <svg class="button-arrow" width="20" height="20" viewBox="0 0 28 28" fill="none"
                                 aria-hidden="true">
                                 <rect width="27.6398" height="27.6398" rx="4.60664" fill="#A7CB19" />
-                                <path d="M6.89409 18.9865C6.4083 19.4723 6.4083 20.2599 6.89409 20.7457C7.37987 21.2315 8.16749 21.2315 8.65328 20.7457L7.77368 19.8661L6.89409 18.9865ZM21.11 7.77367C21.11 7.08667 20.5531 6.52974 19.8661 6.52974H8.67069C7.98369 6.52974 7.42676 7.08667 7.42676 7.77367C7.42676 8.46068 7.98369 9.01761 8.67069 9.01761H18.6222V18.9691C18.6222 19.6561 19.1791 20.213 19.8661 20.213C20.5531 20.213 21.11 19.6561 21.11 18.9691V7.77367ZM7.77368 19.8661L8.65328 20.7457L20.7457 8.65327L19.8661 7.77367L18.9865 6.89408L6.89409 18.9865L7.77368 19.8661Z" fill="#0F322C" />
+                                <path
+                                    d="M6.89409 18.9865C6.4083 19.4723 6.4083 20.2599 6.89409 20.7457C7.37987 21.2315 8.16749 21.2315 8.65328 20.7457L7.77368 19.8661L6.89409 18.9865ZM21.11 7.77367C21.11 7.08667 20.5531 6.52974 19.8661 6.52974H8.67069C7.98369 6.52974 7.42676 7.08667 7.42676 7.77367C7.42676 8.46068 7.98369 9.01761 8.67069 9.01761H18.6222V18.9691C18.6222 19.6561 19.1791 20.213 19.8661 20.213C20.5531 20.213 21.11 19.6561 21.11 18.9691V7.77367ZM7.77368 19.8661L8.65328 20.7457L20.7457 8.65327L19.8661 7.77367L18.9865 6.89408L6.89409 18.9865L7.77368 19.8661Z"
+                                    fill="#0F322C" />
                             </svg></a>
                 </article>@empty<p class="jobs-empty">No open positions right now. Please check back soon.</p>
                     @endforelse<p class="jobs-empty" id="job-filter-empty" hidden>No roles match your search.</p>
                 </div>
-                @if ($jobs->count() > 5)<a class="button button-lime all-jobs-button" href="{{ route('vacancies.index') }}">View all opportunities <svg class="button-arrow" width="24" height="24" viewBox="0 0 28 28"
-                    fill="none" aria-hidden="true">
-                    <rect width="27.6398" height="27.6398" rx="4.60664" fill="#A7CB19" />
-                    <path d="M6.89409 18.9865C6.4083 19.4723 6.4083 20.2599 6.89409 20.7457C7.37987 21.2315 8.16749 21.2315 8.65328 20.7457L7.77368 19.8661L6.89409 18.9865ZM21.11 7.77367C21.11 7.08667 20.5531 6.52974 19.8661 6.52974H8.67069C7.98369 6.52974 7.42676 7.08667 7.42676 7.77367C7.42676 8.46068 7.98369 9.01761 8.67069 9.01761H18.6222V18.9691C18.6222 19.6561 19.1791 20.213 19.8661 20.213C20.5531 20.213 21.11 19.6561 21.11 18.9691V7.77367ZM7.77368 19.8661L8.65328 20.7457L20.7457 8.65327L19.8661 7.77367L18.9865 6.89408L6.89409 18.9865L7.77368 19.8661Z" fill="#0F322C" />
+                @if ($jobs->count() > 5)<a class="button button-lime all-jobs-button"
+                    href="{{ route('vacancies.index') }}">View all opportunities <svg class="button-arrow" width="24"
+                        height="24" viewBox="0 0 28 28" fill="none" aria-hidden="true">
+                        <rect width="27.6398" height="27.6398" rx="4.60664" fill="#A7CB19" />
+                        <path
+                            d="M6.89409 18.9865C6.4083 19.4723 6.4083 20.2599 6.89409 20.7457C7.37987 21.2315 8.16749 21.2315 8.65328 20.7457L7.77368 19.8661L6.89409 18.9865ZM21.11 7.77367C21.11 7.08667 20.5531 6.52974 19.8661 6.52974H8.67069C7.98369 6.52974 7.42676 7.08667 7.42676 7.77367C7.42676 8.46068 7.98369 9.01761 8.67069 9.01761H18.6222V18.9691C18.6222 19.6561 19.1791 20.213 19.8661 20.213C20.5531 20.213 21.11 19.6561 21.11 18.9691V7.77367ZM7.77368 19.8661L8.65328 20.7457L20.7457 8.65327L19.8661 7.77367L18.9865 6.89408L6.89409 18.9865L7.77368 19.8661Z"
+                            fill="#0F322C" />
                 </svg></a>@endif
             </div>
         </section>

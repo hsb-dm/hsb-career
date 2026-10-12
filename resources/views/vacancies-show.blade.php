@@ -12,6 +12,9 @@
         'canonical' => route('vacancies.show', $job->slug),
         'type' => 'article',
     ])
+    @if ($job->status === \App\Enums\JobStatus::Inactive)
+        <meta name="robots" content="noindex, follow">
+    @endif
     @if ($job->published_at)
         @php
             $jobPosting = [
@@ -40,7 +43,7 @@
                     ],
                 ],
                 'url' => route('vacancies.show', $job->slug),
-                'directApply' => true,
+                'directApply' => $job->status === \App\Enums\JobStatus::Active,
             ];
 
             if ($job->work_arrangement === \App\Enums\WorkArrangement::Remote) {
@@ -95,16 +98,20 @@
                         {!! \Illuminate\Support\Str::sanitizeHtml($job->description) !!}
                     </div>
                 </div>
-                <aside class="vacancy-apply-card" aria-label="Apply for this role">
+                <aside class="vacancy-apply-card" aria-label="{{ $job->status === \App\Enums\JobStatus::Active ? 'Apply for this role' : 'This role is closed' }}">
                     <h2>{{ $job->title }}</h2>
                     <ul class="vacancy-card-details">
                         <li><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="4" y="10" width="24" height="18" rx="2" stroke="currentColor" stroke-width="2.5"/><path d="M12 10V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg><span>{{ $job->department }}</span></li>
                         <li><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="9" r="5" stroke="currentColor" stroke-width="2.5"/><path d="M5 28v-3a9 9 0 0 1 9-9h4a9 9 0 0 1 9 9v3H5Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/></svg><span>{{ str_replace(' ', '-', $job->employment_type->label()) }}</span></li>
                         <li><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M16 29s10-9.1 10-18a10 10 0 1 0-20 0c0 8.9 10 18 10 18Z" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><circle cx="16" cy="11" r="3.5" stroke="currentColor" stroke-width="2.5"/></svg><span>{{ $job->location }}</span></li>
                     </ul>
-                    <a class="button button-lime vacancy-apply" href="{{ route('vacancies.apply', $job->slug) }}"><span>Apply Now</span>
-                        <svg class="button-arrow" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect width="44" height="44" rx="8" fill="#A7CB19" /><path d="M12 32 32 12M16 12h16v16" stroke="#0F322C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" /></svg>
-                    </a>
+                    @if ($job->status === \App\Enums\JobStatus::Active)
+                        <a class="button button-lime vacancy-apply" href="{{ route('vacancies.apply', $job->slug) }}"><span>Apply Now</span>
+                            <svg class="button-arrow" viewBox="0 0 44 44" fill="none" aria-hidden="true"><rect width="44" height="44" rx="8" fill="#A7CB19" /><path d="M12 32 32 12M16 12h16v16" stroke="#0F322C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" /></svg>
+                        </a>
+                    @else
+                        <button class="button vacancy-apply vacancy-closed" type="button" disabled>Closed</button>
+                    @endif
                 </aside>
             </div>
         </section>

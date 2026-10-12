@@ -35,7 +35,7 @@ test('vacancies page keeps search and job type query values in the filters', fun
         ->assertSee('<span data-job-selection>Full Time</span>', false);
 });
 
-test('active vacancy has a detail page and inactive vacancy is hidden', function () {
+test('active and inactive vacancies have detail pages with the correct application state', function () {
     $active = Job::factory()->create([
         'title' => 'Legal & Compliance Manager',
         'status' => JobStatus::Active,
@@ -58,7 +58,13 @@ test('active vacancy has a detail page and inactive vacancy is hidden', function
         ->assertSee('Lead our compliance team.')
         ->assertDontSee('<script>', false);
 
-    $this->get(route('vacancies.show', $inactive->slug))->assertNotFound();
+    $this->get(route('vacancies.show', $inactive->slug))
+        ->assertOk()
+        ->assertSee($inactive->title)
+        ->assertSee('<meta name="robots" content="noindex, follow">', false)
+        ->assertSee('class="button vacancy-apply vacancy-closed" type="button" disabled', false)
+        ->assertSee('Closed')
+        ->assertDontSee(route('vacancies.apply', $inactive->slug));
     $this->get('/vacancies/unknown-role')->assertNotFound();
 });
 

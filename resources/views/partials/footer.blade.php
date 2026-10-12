@@ -73,16 +73,18 @@
 @endphp
 
 @if ($showAwards ?? true)
-<section class="awards-strip" aria-labelledby="awards-title">
-    <div class="container awards-inner">
-        <h2 id="awards-title">Memenangkan<br class="awards-desktop-break"> Berbagai<br class="awards-mobile-break"> Macam<br class="awards-desktop-break"> Penghargaan</h2>
-        <ul class="award-items" role="list">
-            @foreach ($awards as [$year, $title])
-                <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt="{{ $title }}" width="307" height="140" loading="lazy"></li>
-            @endforeach
-        </ul>
-    </div>
-</section>
+    <section class="awards-strip" aria-labelledby="awards-title">
+        <div class="container awards-inner">
+            <h2 id="awards-title">Memenangkan<br class="awards-desktop-break"> Berbagai<br class="awards-mobile-break">
+                Macam<br class="awards-desktop-break"> Penghargaan</h2>
+            <ul class="award-items" role="list">
+                @foreach ($awards as [$year, $title])
+                    <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt="{{ $title }}" width="307" height="140"
+                            loading="lazy"></li>
+                @endforeach
+            </ul>
+        </div>
+    </section>
 @endif
 
 <footer class="footer">
@@ -113,22 +115,29 @@
                 <h3>Download</h3>
                 <div class="download-assets">
                     <div class="store-badges">
-                        <a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Download di App Store"><img src="{{ asset('images/hsb-footer/app-store.svg') }}" alt="App Store" loading="lazy"></a>
-                        <a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Download di Google Play"><img src="{{ asset('images/hsb-footer/google-play.svg') }}" alt="Google Play" loading="lazy"></a>
+                        <a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer"
+                            aria-label="Download di App Store"><img src="{{ asset('images/hsb-footer/app-store.svg') }}"
+                                alt="App Store" loading="lazy"></a>
+                        <a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer"
+                            aria-label="Download di Google Play"><img
+                                src="{{ asset('images/hsb-footer/google-play.svg') }}" alt="Google Play"
+                                loading="lazy"></a>
                     </div>
-                    <img class="download-qr" src="{{ asset('images/hsb-footer/qr.webp') }}" alt="QR code download aplikasi HSB" width="110" height="110" loading="lazy">
+                    <img class="download-qr" src="{{ asset('images/hsb-footer/qr.webp') }}"
+                        alt="QR code download aplikasi HSB" width="110" height="110" loading="lazy">
                 </div>
-                <h3 class="footer-subheading">Hubungi Kami</h3>
-                <a href="https://wa.me/628211019087" target="_blank" rel="noopener noreferrer">Whatsapp: +62 821-1019-087</a>
-                <p>Hotline: +62 215-0122-288</p>
+
                 <h3 class="footer-subheading">Follow Us</h3>
                 <div class="footer-socials">
                     @foreach ($socials as [$name, $icon, $href])
-                        <a href="{{ $href }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $name }}"><img src="{{ asset("images/hsb-footer/$icon") }}" alt="" loading="lazy"></a>
+                        <a href="{{ $href }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $name }}"><img
+                                src="{{ asset("images/hsb-footer/$icon") }}" alt="" loading="lazy"></a>
                     @endforeach
                 </div>
                 <h3 class="footer-subheading">Join Komunitas HSB</h3>
-                <div class="footer-socials"><a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer" aria-label="Komunitas HSB di Telegram"><img src="{{ asset('images/hsb-footer/telegram.svg') }}" alt="" loading="lazy"></a></div>
+                <div class="footer-socials"><a href="{{ $downloadUrl }}" target="_blank" rel="noopener noreferrer"
+                        aria-label="Komunitas HSB di Telegram"><img src="{{ asset('images/hsb-footer/telegram.svg') }}"
+                            alt="" loading="lazy"></a></div>
             </div>
         </div>
 
@@ -136,17 +145,40 @@
             <div class="footer-regulations">
                 <h3>Legalitas</h3>
                 <dl>
-                    <div><dt>Badan Pengawas Perdagangan Berjangka Komoditi</dt><dd>001/BAPPEBTI/SI/05/2018<br>001/BAPPEBTI/SP-SPA/05/2018<br>03/BAPPEBTI/KEP-PBK/9/2018<br>003/BAPPEBTI/SP-PN/07/2020</dd></div>
-                    <div><dt>Bank Indonesia</dt><dd>27/546/DPPK/Srt/B</dd></div>
-                    <div><dt>Otoritas Jasa Keuangan</dt><dd>S-292/PM.02/2025</dd></div>
-                    <div><dt>Bursa Komoditi dan Derivatif Indonesia</dt><dd>197/SPKB/ICDX/DIR/VI/2020</dd></div>
-                    <div><dt>Indonesia Clearing House</dt><dd>026/OTC/ICH/DIR/VI/2020<br>178/SPKK/ICH/VI/2020</dd></div>
-                    <div><dt>Keanggotaan Lembaga Asosiasi</dt><dd>1291/ASPEBTINDO/ANG-B/6/2018</dd></div>
+                    <div>
+                        <dt>Badan Pengawas Perdagangan Berjangka Komoditi</dt>
+                        <dd>001/BAPPEBTI/SI/05/2018<br>001/BAPPEBTI/SP-SPA/05/2018<br>03/BAPPEBTI/KEP-PBK/9/2018<br>003/BAPPEBTI/SP-PN/07/2020
+                        </dd>
+                    </div>
+                    <div>
+                        <dt>Bank Indonesia</dt>
+                        <dd>27/546/DPPK/Srt/B</dd>
+                    </div>
+                    <div>
+                        <dt>Otoritas Jasa Keuangan</dt>
+                        <dd>S-292/PM.02/2025</dd>
+                    </div>
+                    <div>
+                        <dt>Bursa Komoditi dan Derivatif Indonesia</dt>
+                        <dd>197/SPKB/ICDX/DIR/VI/2020</dd>
+                    </div>
+                    <div>
+                        <dt>Indonesia Clearing House</dt>
+                        <dd>026/OTC/ICH/DIR/VI/2020<br>178/SPKK/ICH/VI/2020</dd>
+                    </div>
+                    <div>
+                        <dt>Keanggotaan Lembaga Asosiasi</dt>
+                        <dd>1291/ASPEBTINDO/ANG-B/6/2018</dd>
+                    </div>
                 </dl>
             </div>
             <div class="footer-risk">
                 <h3>Peringatan Risiko :</h3>
-                <p>Produk dengan leverage memiliki tingkat risiko yang tinggi terhadap modal yang anda investasikan dan disarankan hanya menggunakan dana yang mampu anda tanggung apabila terjadi kerugian. Nilai investasi dapat turun atau naik dan Anda dapat kehilangan pembayaran margin awal anda. Harap diketahui bahwa produk dengan leverage belum tentu cocok untuk semua orang, jadi pastikan anda telah memahami sepenuhnya semua risiko yang terlibat.</p>
+                <p>Produk dengan leverage memiliki tingkat risiko yang tinggi terhadap modal yang anda investasikan dan
+                    disarankan hanya menggunakan dana yang mampu anda tanggung apabila terjadi kerugian. Nilai investasi
+                    dapat turun atau naik dan Anda dapat kehilangan pembayaran margin awal anda. Harap diketahui bahwa
+                    produk dengan leverage belum tentu cocok untuk semua orang, jadi pastikan anda telah memahami
+                    sepenuhnya semua risiko yang terlibat.</p>
             </div>
         </div>
 
