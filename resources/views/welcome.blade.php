@@ -196,7 +196,8 @@
                                 aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (!$loop->first) hidden
                                 @endif>
                                 @foreach ($lifeImageIds as $imageId)
-                                    <img src="{{ asset('images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp') }}"
+                                    @php($lifeImagePath = 'images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp')
+                                    <img src="{{ asset($lifeImagePath) }}?v={{ filemtime(public_path($lifeImagePath)) }}"
                                         alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
                                         width="573" height="573" loading="lazy" decoding="async">
                                 @endforeach
