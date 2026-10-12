@@ -154,7 +154,8 @@
         <section class="benefits section-dark" id="benefits" aria-labelledby="benefits-title">
             <div class="container">
                 <h2 class="section-title" id="benefits-title">WHAT COMES<br>WITH <span>THE ROLE</span></h2>
-                <p class="section-intro">We support your growth with competitive benefits, a great environment, and
+                <p class="section-intro">We support your growth with competitive benefits, a great environment, <br />
+                    and
                     exclusive rewards for top performance.
                 </p>
                 <div class="benefits-grid">
@@ -191,17 +192,17 @@
                     </div>
                     <div class="life-panels">
                         @foreach ($lifeCategories as $category)
-                            <div class="life-panel {{ $loop->first ? 'is-active' : '' }}"
-                                id="life-panel-{{ $category['slug'] }}" role="tabpanel"
-                                aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (!$loop->first) hidden
-                                @endif>
-                                @foreach ($lifeImageIds as $imageId)
-                                    @php($lifeImagePath = 'images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp')
-                                    <img src="{{ asset($lifeImagePath) }}?v={{ filemtime(public_path($lifeImagePath)) }}"
-                                        alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
-                                        width="573" height="573" loading="lazy" decoding="async">
-                                @endforeach
-                            </div>
+                        <div class="life-panel {{ $loop->first ? 'is-active' : '' }}"
+                            id="life-panel-{{ $category['slug'] }}" role="tabpanel"
+                            aria-labelledby="life-tab-{{ $category['slug'] }}" tabindex="0" @if (!$loop->first) hidden
+                            @endif>
+                            @foreach ($lifeImageIds as $imageId)
+                            @php($lifeImagePath = 'images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp')
+                            <img src="{{ asset($lifeImagePath) }}?v={{ filemtime(public_path($lifeImagePath)) }}"
+                                alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
+                                width="573" height="573" loading="lazy" decoding="async">
+                            @endforeach
+                        </div>
                         @endforeach
                     </div>
                 </div>
