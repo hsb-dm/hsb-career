@@ -64,6 +64,7 @@
         ['LinkedIn', 'linkedin.svg', 'https://www.linkedin.com/company/hsb-investasi'],
     ];
     $awards = [
+        ['2026', 'Penghargaan HSB 2026'],
         ['2025', 'Best OTC Broker 2025'],
         ['2024', 'Most Innovative Broker 2024'],
         ['2023', 'Most Improved Broker 2023'],
@@ -77,12 +78,22 @@
         <div class="container awards-inner">
             <h2 id="awards-title">Memenangkan<br class="awards-desktop-break"> Berbagai<br class="awards-mobile-break">
                 Macam<br class="awards-desktop-break"> Penghargaan</h2>
-            <ul class="award-items" role="list">
-                @foreach ($awards as [$year, $title])
-                    <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt="{{ $title }}" width="307" height="140"
-                            loading="lazy"></li>
-                @endforeach
-            </ul>
+            <div class="awards-viewport" tabindex="0" aria-label="Penghargaan HSB Investasi">
+                <div class="awards-track">
+                    <ul class="award-items" role="list">
+                        @foreach ($awards as [$year, $title])
+                            <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt="{{ $title }}"
+                                    width="307" height="140" loading="lazy" decoding="async"></li>
+                        @endforeach
+                    </ul>
+                    <ul class="award-items" role="presentation" aria-hidden="true">
+                        @foreach ($awards as [$year, $title])
+                            <li><img src="{{ asset("images/hsb-footer/award-$year.webp") }}" alt=""
+                                    width="307" height="140" loading="lazy" decoding="async"></li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
         </div>
     </section>
 @endif

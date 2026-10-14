@@ -21,6 +21,8 @@ test('homepage shows active jobs and hides inactive jobs', function () {
     $this->get('/')
         ->assertOk()
         ->assertSee('BUILD YOUR')
+        ->assertSee('Penghargaan HSB 2026')
+        ->assertSee('images/hsb-footer/award-2026.webp')
         ->assertSee('Active Design Role')
         ->assertSee(route('vacancies.show', $active->slug))
         ->assertSee(route('vacancies.index'))
