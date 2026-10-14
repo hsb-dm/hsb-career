@@ -129,8 +129,6 @@
                 <p class="section-intro">Discover the people and stories that bring our culture to life.</p>
                 <div class="people-grid">
                     @foreach ([
-                            ['Fia', 'Finance, Accounting & Tax Manager', 'Proud to be part of HSB Investasi, where I grow and make an impact every day.'],
-                            ['Tasya', 'Senior Legal & Compliance Officer', 'I’m proud to protect HSB’s reputation while helping the business move forward with integrity.'],
                             ['Cio', 'Product Manager', 'At HSB, I value the trust to take full ownership, from identifying problems to launching solutions.'],
                             ['Iqbal', 'Performance Marketing Specialist', 'Working at HSB provides tremendous opportunities for growth.'],
                             ['Raden', 'IT Senior Officer', 'HSB has opened new horizons for me in technology.'],
@@ -177,7 +175,7 @@
                         ['slug' => 'sport', 'label' => 'Sport Day'],
                         ['slug' => 'birthday', 'label' => 'Birthday Celebration'],
                         ['slug' => 'special', 'label' => 'Special Day Celebration'],
-                        ['slug' => 'reward-trip', 'label' => 'BD Reward Trip'],
+                        ['slug' => 'reward-trip', 'label' => 'Team Reward Trip'],
                     ];
                     $lifeImageIds = ['3498', '3499', '3500', '3501'];
                 @endphp
@@ -198,7 +196,7 @@
                             @endif>
                             @foreach ($lifeImageIds as $imageId)
                             @php($lifeImagePath = 'images/home/slider/' . $category['slug'] . '/Frame 100001' . $imageId . '.webp')
-                            <img src="{{ asset($lifeImagePath) }}?v={{ filemtime(public_path($lifeImagePath)) }}"
+                            <img src="{{ asset($lifeImagePath) }}?v={{ substr(hash_file('sha256', public_path($lifeImagePath)), 0, 12) }}"
                                 alt="{{ $category['label'] }} at HSB Investasi, photo {{ $loop->iteration }}"
                                 width="573" height="573" loading="lazy" decoding="async">
                             @endforeach
