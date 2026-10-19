@@ -45,8 +45,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
-                RecruitmentWelcome::class,
                 RecruitmentStatsOverview::class,
+                RecruitmentWelcome::class,
                 RecentApplicants::class,
                 ApplicantsByStatusChart::class,
                 ApplicantsPerJob::class,

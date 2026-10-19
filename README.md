@@ -75,7 +75,9 @@ DB_PASSWORD=secret
 
 ## Storage
 
-CV files are stored on the `local` disk at `storage/app/private`, so they are not exposed through permanent public URLs.
+CV files use the `local` disk at `storage/app/private` while any AWS S3 setting (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, or `AWS_BUCKET`) is empty. When all four are set, new CV uploads use the `s3` disk. Keep the bucket private.
+
+Existing local CVs remain available to the admin panel. If S3 credentials are removed later, CVs stored on S3 cannot be read until access is restored.
 
 The seeder creates one sample CV file at:
 

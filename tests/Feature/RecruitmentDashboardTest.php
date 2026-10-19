@@ -4,10 +4,12 @@ use App\Enums\ApplicantStatus;
 use App\Enums\EmploymentType;
 use App\Enums\JobStatus;
 use App\Enums\WorkArrangement;
+use App\Filament\Pages\RecruitmentDashboard;
 use App\Filament\Resources\Applicants\ApplicantResource;
 use App\Filament\Resources\Applicants\Pages\ListApplicants;
 use App\Filament\Resources\Applicants\Pages\ViewApplicant;
 use App\Filament\Resources\Jobs\Pages\CreateJob;
+use App\Filament\Widgets\RecentApplicants;
 use App\Filament\Widgets\RecruitmentStatsOverview;
 use App\Models\Applicant;
 use App\Models\Job;
@@ -17,6 +19,7 @@ use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
 use function Pest\Laravel\assertDatabaseHas;
@@ -51,6 +54,25 @@ test('admin can open dashboard', function () {
         ->assertSee('A clear view of your hiring pipeline.')
         ->assertSee('Review applicants')
         ->assertSee('Manage jobs');
+
+    expect(array_values((new RecruitmentDashboard)->getWidgets())[0])->toBe(RecruitmentStatsOverview::class);
+});
+
+test('applicant dates display in WIB and date filters use WIB boundaries', function () {
+    $inside = Applicant::factory()->create(['applied_at' => '2026-10-18 18:00:00']);
+    $outside = Applicant::factory()->create(['applied_at' => '2026-10-18 16:00:00']);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ListApplicants::class)
+        ->filterTable('applied_at', ['from' => '2026-10-19', 'until' => '2026-10-19'])
+        ->assertCanSeeTableRecords([$inside])
+        ->assertCanNotSeeTableRecords([$outside])
+        ->assertSee('19 Oct 2026 01:00 WIB');
+
+    $this->get(ApplicantResource::getUrl('view', ['record' => $inside]))
+        ->assertSee('19 Oct 2026 01:00 WIB');
+
+    livewire(RecentApplicants::class)->assertSee('19 Oct 2026 01:00 WIB');
 });
 
 test('dashboard calculates applicant summary with one aggregate query', function () {
@@ -69,6 +91,7 @@ test('dashboard calculates applicant summary with one aggregate query', function
 
     livewire(RecruitmentStatsOverview::class)
         ->assertSee('Total applicants')
+        ->assertSee('Talent pool')
         ->assertSee('HR Interview');
 
     expect($summaryQueries)->toHaveCount(1);
@@ -159,6 +182,32 @@ test('HR can update each applicant status and filter the list by it', function (
         ->assertHasNoErrors();
 
     expect($screened->fresh()->status)->toBe(ApplicantStatus::HrInterview);
+});
+
+test('overview latest applications can be filtered by status', function () {
+    $screened = Applicant::factory()->create(['status' => ApplicantStatus::AiAtsScreened]);
+    $hired = Applicant::factory()->create(['status' => ApplicantStatus::Hired]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(RecentApplicants::class)
+        ->filterTable('status', ApplicantStatus::Hired)
+        ->assertCanSeeTableRecords([$hired])
+        ->assertCanNotSeeTableRecords([$screened]);
+});
+
+test('HR can delete an applicant and its CV', function () {
+    Storage::fake('local');
+    $path = UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf')->store('cvs', 'local');
+    $applicant = Applicant::factory()->create(['cv_path' => $path]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ViewApplicant::class, ['record' => $applicant->id])
+        ->assertActionVisible('delete')
+        ->callAction('delete')
+        ->assertHasNoErrors();
+
+    expect(Applicant::query()->whereKey($applicant->id)->exists())->toBeFalse();
+    Storage::disk('local')->assertMissing($path);
 });
 
 test('HR can change status from the applicant detail page', function () {
@@ -257,6 +306,23 @@ test('salary is stored as integer', function () {
 
     expect($applicant->refresh()->current_salary)->toBeInt()
         ->and($applicant->expected_salary)->toBeInt();
+});
+
+test('existing salary answers are converted to IDR amounts during migration', function () {
+    $applicant = Applicant::factory()->create([
+        'current_salary' => null,
+        'expected_salary' => null,
+        'current_salary_answer' => 'Rp 8.000.000',
+        'expected_salary_answer' => 'Rp 10.000.000 negotiable',
+    ]);
+
+    Schema::table('applicants', fn ($table) => $table->dropColumn(['application_source', 'referral_from']));
+    Schema::table('talent_pool_entries', fn ($table) => $table->dropColumn('status'));
+    (require database_path('migrations/2026_10_19_000000_add_hr_feedback_fields.php'))->up();
+
+    $applicant->refresh();
+    expect($applicant->current_salary)->toBe(8000000)
+        ->and($applicant->expected_salary)->toBe(10000000);
 });
 
 test('database seeder runs without errors', function () {

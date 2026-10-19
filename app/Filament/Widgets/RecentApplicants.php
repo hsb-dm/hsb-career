@@ -6,6 +6,7 @@ use App\Enums\ApplicantStatus;
 use App\Filament\Resources\Applicants\ApplicantResource;
 use App\Models\Applicant;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Illuminate\Database\Eloquent\Builder;
@@ -23,6 +24,9 @@ class RecentApplicants extends TableWidget
             ->emptyStateDescription('New applications will appear here when candidates submit a form.')
             ->query(fn (): Builder => Applicant::query()->with('job')->latest('applied_at')->limit(10))
             ->paginated(false)
+            ->filters([
+                SelectFilter::make('status')->label('Applicant status')->options(ApplicantStatus::options()),
+            ])
             ->recordUrl(
                 fn (Applicant $record): string => ApplicantResource::getUrl('view', ['record' => $record]),
                 shouldOpenInNewTab: true,
@@ -37,7 +41,8 @@ class RecentApplicants extends TableWidget
                     ->color(fn (ApplicantStatus $state): string => $state->color()),
                 TextColumn::make('applied_at')
                     ->label('Applied at')
-                    ->dateTime('d M Y H:i'),
+                    ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                    ->suffix(' WIB'),
             ]);
     }
 }

@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\ApplicantStatus;
+use App\Support\CvStorage;
 use Database\Factories\ApplicantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * @property int $id
@@ -55,11 +57,22 @@ use Illuminate\Support\Carbon;
     'third_latest_company_reference',
     'serious_disease',
     'serious_disease_details',
+    'application_source',
+    'referral_from',
 ])]
 class Applicant extends Model
 {
     /** @use HasFactory<ApplicantFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::deleted(function (self $applicant): void {
+            if ($disk = CvStorage::readDisk($applicant->cv_path)) {
+                Storage::disk($disk)->delete($applicant->cv_path);
+            }
+        });
+    }
 
     /**
      * @return BelongsTo<Job, $this>

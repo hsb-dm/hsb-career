@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Applicants\Pages;
 use App\Filament\Resources\Applicants\Actions\ApplicantCvActions;
 use App\Filament\Resources\Applicants\Actions\UpdateStatusAction;
 use App\Filament\Resources\Applicants\ApplicantResource;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\ViewRecord;
 
 class ViewApplicant extends ViewRecord
@@ -17,6 +18,7 @@ class ViewApplicant extends ViewRecord
             UpdateStatusAction::make(),
             ApplicantCvActions::preview(),
             ApplicantCvActions::download(),
+            DeleteAction::make(),
         ];
     }
 }

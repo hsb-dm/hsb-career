@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ApplicantStatus;
 use App\Models\Job;
+use App\Support\CvStorage;
 use App\Support\ScreeningForm;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -30,7 +31,8 @@ class VacancyApplicationController extends Controller
         $cv = $validated['cv'];
         unset($validated['cv']);
         $data = ScreeningForm::normalized($validated);
-        $cvPath = $cv->store('cvs', 'local');
+        $disk = CvStorage::writeDisk();
+        $cvPath = $cv->store('cvs', $disk);
         if ($cvPath === false) {
             throw new RuntimeException('Unable to store the uploaded CV.');
         }
@@ -43,7 +45,7 @@ class VacancyApplicationController extends Controller
                 'applied_at' => now(),
             ]);
         } catch (Throwable $exception) {
-            Storage::disk('local')->delete($cvPath);
+            Storage::disk($disk)->delete($cvPath);
 
             throw $exception;
         }

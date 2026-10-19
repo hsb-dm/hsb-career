@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Applicant;
 use App\Models\TalentPoolEntry;
+use App\Support\CvStorage;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -17,9 +18,10 @@ class CvPreviewController extends Controller
     public function applicantDownload(Applicant $applicant): StreamedResponse
     {
         $path = $applicant->cv_path;
-        abort_if(blank($path) || ! Storage::disk('local')->exists($path), 404, 'CV file is not available.');
+        $disk = CvStorage::readDisk($path);
+        abort_if($disk === null, 404, 'CV file is not available.');
 
-        return Storage::disk('local')->download($path, basename($path));
+        return Storage::disk($disk)->download($path, basename($path));
     }
 
     public function talentPool(TalentPoolEntry $entry): StreamedResponse
@@ -29,10 +31,11 @@ class CvPreviewController extends Controller
 
     private function preview(?string $path): StreamedResponse
     {
-        abort_if(blank($path) || ! Storage::disk('local')->exists($path), 404, 'CV file is not available.');
+        $disk = CvStorage::readDisk($path);
+        abort_if($disk === null, 404, 'CV file is not available.');
         abort_unless(str_ends_with(strtolower($path), '.pdf'), 404, 'CV preview is only available for PDF files.');
 
-        return Storage::disk('local')->response($path, basename($path), [
+        return Storage::disk($disk)->response($path, basename($path), [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="'.basename($path).'"',
         ]);

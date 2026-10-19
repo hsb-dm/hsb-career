@@ -37,10 +37,12 @@ class JobInfolist
                             ->label('Total applicants')
                             ->state(fn (Job $record): int => $record->applicants()->count()),
                         TextEntry::make('published_at')
-                            ->dateTime('d M Y H:i')
+                            ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                            ->suffix(' WIB')
                             ->placeholder('-'),
                         TextEntry::make('closed_at')
-                            ->dateTime('d M Y H:i')
+                            ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                            ->suffix(' WIB')
                             ->placeholder('-'),
                     ])
                     ->columns(2),

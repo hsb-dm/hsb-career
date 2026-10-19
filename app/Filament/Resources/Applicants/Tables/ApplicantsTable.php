@@ -8,6 +8,8 @@ use App\Models\Applicant;
 use App\Support\Rupiah;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -17,6 +19,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 class ApplicantsTable
@@ -41,12 +44,12 @@ class ApplicantsTable
                     ->toggleable(),
                 TextColumn::make('current_salary')
                     ->label('Current salary')
-                    ->state(fn (Applicant $record): string => $record->current_salary_answer ?? Rupiah::format($record->current_salary))
+                    ->state(fn (Applicant $record): string => Rupiah::format($record->current_salary))
                     ->sortable()
                     ->toggleable(),
                 TextColumn::make('expected_salary')
                     ->label('Expected salary')
-                    ->state(fn (Applicant $record): string => $record->expected_salary_answer ?? Rupiah::format($record->expected_salary))
+                    ->state(fn (Applicant $record): string => Rupiah::format($record->expected_salary))
                     ->sortable(),
                 TextColumn::make('notice_period')
                     ->label('Notice period')
@@ -57,7 +60,8 @@ class ApplicantsTable
                     ->selectablePlaceholder(false),
                 TextColumn::make('applied_at')
                     ->label('Applied at')
-                    ->dateTime('d M Y H:i')
+                    ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                    ->suffix(' WIB')
                     ->sortable(),
             ])
             ->filters([
@@ -66,6 +70,7 @@ class ApplicantsTable
                     ->relationship('job', 'title')
                     ->searchable(),
                 SelectFilter::make('status')
+                    ->label('Applicant status')
                     ->options(ApplicantStatus::options()),
                 Filter::make('applied_at')
                     ->schema([
@@ -75,11 +80,12 @@ class ApplicantsTable
                             ->label('Applied until'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
-                        ->when($data['from'] ?? null, fn (Builder $query, string $date) => $query->whereDate('applied_at', '>=', $date))
-                        ->when($data['until'] ?? null, fn (Builder $query, string $date) => $query->whereDate('applied_at', '<=', $date))),
+                        ->when($data['from'] ?? null, fn (Builder $query, string $date) => $query->where('applied_at', '>=', Carbon::parse($date, 'Asia/Jakarta')->startOfDay()->utc()))
+                        ->when($data['until'] ?? null, fn (Builder $query, string $date) => $query->where('applied_at', '<=', Carbon::parse($date, 'Asia/Jakarta')->endOfDay()->utc()))),
             ])
             ->recordActions([
                 ApplicantViewAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
@@ -100,6 +106,7 @@ class ApplicantsTable
                                 ->success()
                                 ->send();
                         }),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

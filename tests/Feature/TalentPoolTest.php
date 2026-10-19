@@ -1,11 +1,14 @@
 <?php
 
+use App\Filament\Resources\TalentPool\Pages\ListTalentPoolEntries;
 use App\Filament\Resources\TalentPool\TalentPoolResource;
 use App\Models\TalentPoolEntry;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+
+use function Pest\Livewire\livewire;
 
 uses(RefreshDatabase::class);
 
@@ -30,6 +33,26 @@ test('visitor can join talent pool and see success state', function () {
         ->assertOk()
         ->assertSee('success-talentpool.png')
         ->assertSee("Thanks, we've got your details.", false);
+});
+
+test('talent pool stores CVs on S3 when configured', function () {
+    config()->set('filesystems.cv_disk', 's3');
+    Storage::fake('local');
+    Storage::fake('s3');
+
+    $this->post(route('talent-pool.store'), [
+        'name' => 'Nadia Candidate',
+        'email' => 'nadia@example.com',
+        'area_of_interest' => 'Technology',
+        'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
+    ])->assertRedirect(route('home').'#talent-pool');
+
+    $entry = TalentPoolEntry::query()->sole();
+    Storage::disk('s3')->assertExists($entry->cv_path);
+    Storage::disk('local')->assertMissing($entry->cv_path);
+
+    $this->actingAs(User::factory()->create())
+        ->get(route('admin.talent-pool.cv.preview', $entry))->assertOk();
 });
 
 test('invalid talent pool submission returns to form without saving', function () {
@@ -83,4 +106,22 @@ test('talent pool entries are visible in the admin menu and CV requires login', 
     $this->get(TalentPoolResource::getUrl('view', ['record' => $entry]))
         ->assertOk()
         ->assertSee('Technology');
+});
+
+test('HR can set either talent pool status', function () {
+    Storage::fake('local');
+    $entry = TalentPoolEntry::create([
+        'name' => 'Nadia Candidate',
+        'email' => 'nadia@example.com',
+        'area_of_interest' => 'Technology',
+        'cv_path' => 'talent-pool-cvs/resume.pdf',
+    ]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ListTalentPoolEntries::class)
+        ->call('updateTableColumnState', 'status', (string) $entry->id, 'contacted')
+        ->assertHasNoErrors();
+
+    expect($entry->fresh()->status)->toBe('contacted')
+        ->and(array_values(TalentPoolEntry::STATUSES))->toBe(['No suitable opportunities', 'Contacted']);
 });

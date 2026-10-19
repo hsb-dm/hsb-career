@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\TalentPoolEntry;
+use App\Support\CvStorage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use RuntimeException;
+use Throwable;
 
 class TalentPoolController extends Controller
 {
@@ -36,14 +40,24 @@ class TalentPoolController extends Controller
 
         $data = $validator->validated();
 
-        $cvPath = $request->file('cv')->store('talent-pool-cvs', 'local');
+        $disk = CvStorage::writeDisk();
+        $cvPath = $request->file('cv')->store('talent-pool-cvs', $disk);
+        if ($cvPath === false) {
+            throw new RuntimeException('Unable to store the uploaded CV.');
+        }
 
-        TalentPoolEntry::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'area_of_interest' => $data['area_of_interest'],
-            'cv_path' => $cvPath,
-        ]);
+        try {
+            TalentPoolEntry::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'area_of_interest' => $data['area_of_interest'],
+                'cv_path' => $cvPath,
+            ]);
+        } catch (Throwable $exception) {
+            Storage::disk($disk)->delete($cvPath);
+
+            throw $exception;
+        }
 
         return to_route($returnRoute)->withFragment('talent-pool')->with('talent_pool_success', true);
     }

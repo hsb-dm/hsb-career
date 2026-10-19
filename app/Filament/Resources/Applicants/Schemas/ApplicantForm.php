@@ -33,6 +33,7 @@ class ApplicantForm
                             ->maxLength(255),
                         DateTimePicker::make('applied_at')
                             ->label('Applied at')
+                            ->timezone('Asia/Jakarta')
                             ->seconds(false)
                             ->default(now())
                             ->required(),

@@ -4,11 +4,11 @@ namespace App\Filament\Resources\Applicants\Schemas;
 
 use App\Enums\ApplicantStatus;
 use App\Models\Applicant;
+use App\Support\CvStorage;
 use App\Support\Rupiah;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApplicantInfolist
@@ -27,7 +27,8 @@ class ApplicantInfolist
                         TextEntry::make('marital_status')->label('Marital Status')->placeholder('-'),
                         TextEntry::make('applied_at')
                             ->label('Applied at')
-                            ->dateTime('d M Y H:i'),
+                            ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                            ->suffix(' WIB'),
                     ])
                     ->columns(2),
                 Section::make('Application information')
@@ -40,10 +41,10 @@ class ApplicantInfolist
                             ->color(fn (ApplicantStatus $state): string => $state->color()),
                         TextEntry::make('current_salary')
                             ->label('Current salary')
-                            ->state(fn (Applicant $record): string => $record->current_salary_answer ?? Rupiah::format($record->current_salary)),
+                            ->state(fn (Applicant $record): string => Rupiah::format($record->current_salary)),
                         TextEntry::make('expected_salary')
                             ->label('Expected salary')
-                            ->state(fn (Applicant $record): string => $record->expected_salary_answer ?? Rupiah::format($record->expected_salary)),
+                            ->state(fn (Applicant $record): string => Rupiah::format($record->expected_salary)),
                         TextEntry::make('salary_increase')
                             ->label('Salary increase')
                             ->state(function (Applicant $record): string {
@@ -59,6 +60,9 @@ class ApplicantInfolist
                             }),
                         TextEntry::make('notice_period')
                             ->label('Join Notification'),
+                        TextEntry::make('application_source')->label('Application source')->placeholder('-'),
+                        TextEntry::make('referral_from')->label('Referred by')->placeholder('-')
+                            ->visible(fn (Applicant $record): bool => filled($record->referral_from)),
                         TextEntry::make('current_status')->label('Current Status')->placeholder('-'),
                         TextEntry::make('current_domicile')->label('Current Domicile')->placeholder('-'),
                         TextEntry::make('english_fluency')->label('English Fluency')->placeholder('-'),
@@ -86,11 +90,11 @@ class ApplicantInfolist
                         TextEntry::make('cv_available')
                             ->label('Availability')
                             ->badge()
-                            ->state(fn (Applicant $record): string => blank($record->cv_path) ? 'Not provided' : (Storage::disk('local')->exists($record->cv_path) ? 'Available' : 'File not found'))
+                            ->state(fn (Applicant $record): string => blank($record->cv_path) ? 'Not provided' : (CvStorage::readDisk($record->cv_path) !== null ? 'Available' : 'File not found'))
                             ->color(fn (string $state): string => $state === 'Available' ? 'success' : ($state === 'Not provided' ? 'gray' : 'warning')),
                         TextEntry::make('cv_preview')
                             ->label('Preview')
-                            ->state(fn (Applicant $record): string => filled($record->cv_path) && Storage::disk('local')->exists($record->cv_path) && Str::endsWith(strtolower($record->cv_path), '.pdf') ? 'PDF preview available' : '-'),
+                            ->state(fn (Applicant $record): string => CvStorage::readDisk($record->cv_path) !== null && Str::endsWith(strtolower($record->cv_path), '.pdf') ? 'PDF preview available' : '-'),
                     ])
                     ->columns(3)
                     ->visible(fn (Applicant $record): bool => filled($record->cv_path)),

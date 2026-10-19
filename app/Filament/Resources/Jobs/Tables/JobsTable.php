@@ -31,7 +31,8 @@ class JobsTable
                     ->label('Applicants')
                     ->sortable(),
                 TextColumn::make('created_at')
-                    ->dateTime('d M Y H:i')
+                    ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                    ->suffix(' WIB')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])

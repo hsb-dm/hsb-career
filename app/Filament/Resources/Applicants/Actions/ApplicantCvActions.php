@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\Applicants\Actions;
 
 use App\Models\Applicant;
+use App\Support\CvStorage;
 use Filament\Actions\Action;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApplicantCvActions
@@ -33,6 +33,6 @@ class ApplicantCvActions
 
     private static function hasFile(Applicant $record): bool
     {
-        return filled($record->cv_path) && Storage::disk('local')->exists($record->cv_path);
+        return CvStorage::readDisk($record->cv_path) !== null;
     }
 }

@@ -24,12 +24,14 @@ class ScreeningForm
                 'current_status' => ['label' => 'Current Status', 'type' => 'select', 'required' => true, 'options' => self::options(['Still Working / employed', 'Available / free / unemployed'])],
                 'current_domicile' => ['label' => 'Current Domicile', 'type' => 'select', 'required' => true, 'options' => self::options(['Jakarta Area', 'Bogor Area', 'Depok Area', 'Tangerang Area', 'Bekasi Area'])],
                 'english_fluency' => ['label' => 'English Fluency', 'type' => 'select', 'required' => true, 'options' => self::options(['Professional', 'Conversation', 'Intermediate', 'Beginner'])],
+                'application_source' => ['label' => 'Where did you hear about this vacancy?', 'type' => 'select', 'required' => true, 'options' => self::options(['Referral', 'Approached by HR', 'Social media', 'Job portal', 'Company website'])],
+                'referral_from' => ['label' => 'Who referred you?', 'type' => 'text'],
             ],
             'Career and compensation' => [
                 'foreign_language_fluency' => ['label' => 'Foreign Language Fluency (Other than English)', 'type' => 'text'],
-                'current_salary_answer' => ['label' => 'Current/Last Salary', 'type' => 'text', 'required' => true],
+                'current_salary_answer' => ['label' => 'Current/Last Salary (IDR)', 'type' => 'text', 'required' => true],
                 'additional_benefits' => ['label' => 'Additional Benefits (Private Insurance, Bonus, Allowance, etc)', 'type' => 'textarea', 'required' => true],
-                'expected_salary_answer' => ['label' => 'Expected Salary', 'type' => 'text', 'required' => true],
+                'expected_salary_answer' => ['label' => 'Expected Salary (IDR)', 'type' => 'text', 'required' => true],
                 'notice_period' => ['label' => 'Join Notification', 'type' => 'select', 'required' => true, 'options' => self::options(['As soon as Possible (ASAP)', '2 weeks notice', '1 month notice', '2 months notice'])],
                 'motivation' => ['label' => 'Motivation for Apply', 'type' => 'textarea', 'required' => true],
                 'reason_for_leaving' => ['label' => 'Reason of Leaving Last Company', 'type' => 'textarea', 'required' => true],
@@ -91,6 +93,10 @@ class ScreeningForm
         }
 
         $rules['serious_disease_details'][] = 'required_if:serious_disease,yes';
+        $rules['referral_from'] = ['required_if:application_source,Referral', 'exclude_unless:application_source,Referral', 'string', 'max:255'];
+        foreach (['current_salary_answer', 'expected_salary_answer'] as $salary) {
+            $rules[$salary][] = 'regex:/^[0-9]{1,15}$/D';
+        }
 
         return $rules;
     }
@@ -122,6 +128,9 @@ class ScreeningForm
             'cv.mimes' => 'Upload a PDF file for your CV / Resume.',
             'cv.max' => 'CV / Resume must be no larger than 5 MB.',
             'serious_disease_details.required_if' => 'Please describe the illness/disease when you select Yes.',
+            'referral_from.required_if' => 'Please enter the name of the person who referred you.',
+            'current_salary_answer.regex' => 'Enter numbers only for the current salary, such as 8000000.',
+            'expected_salary_answer.regex' => 'Enter numbers only for the expected salary, such as 10000000.',
         ];
 
         foreach (self::sections() as $fields) {
@@ -157,6 +166,11 @@ class ScreeningForm
         $data['serious_disease'] = $data['serious_disease'] === 'yes';
         if (! $data['serious_disease']) {
             $data['serious_disease_details'] = null;
+        }
+
+        foreach (['current', 'expected'] as $salary) {
+            $data[$salary.'_salary'] = (int) $data[$salary.'_salary_answer'];
+            unset($data[$salary.'_salary_answer']);
         }
 
         return $data;

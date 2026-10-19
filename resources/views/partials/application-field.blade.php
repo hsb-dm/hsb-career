@@ -2,7 +2,7 @@
     $required = $field['required'] ?? false;
     $invalid = $errors->has($name);
 @endphp
-<div class="application-field">
+<div class="application-field" @if ($name === 'referral_from') data-referral-field @endif>
     <label for="{{ $name }}">{{ $field['label'] }} @if ($required)<span aria-hidden="true">*</span>@endif</label>
 
     @switch($field['type'])
@@ -32,7 +32,7 @@
             @break
 
         @default
-            <input id="{{ $name }}" name="{{ $name }}" type="{{ $field['type'] }}" value="{{ old($name) }}" @if ($field['type'] === 'number') min="1" max="120" @else maxlength="255" @endif @required($required) aria-invalid="{{ $invalid ? 'true' : 'false' }}" @if ($invalid) aria-describedby="{{ $name }}-error" @endif>
+            <input id="{{ $name }}" name="{{ $name }}" type="{{ $field['type'] }}" value="{{ old($name) }}" @if ($field['type'] === 'number') min="1" max="120" @elseif (str_ends_with($name, '_salary_answer')) maxlength="15" inputmode="numeric" pattern="[0-9]{1,15}" placeholder="e.g. 8000000" @else maxlength="255" @endif @required($required) aria-invalid="{{ $invalid ? 'true' : 'false' }}" @if ($invalid) aria-describedby="{{ $name }}-error" @endif>
     @endswitch
 
     @error($name)<p class="application-error" id="{{ $name }}-error">{{ $message }}</p>@enderror

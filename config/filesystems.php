@@ -15,6 +15,11 @@ return [
 
     'default' => env('FILESYSTEM_DISK', 'local'),
 
+    'cv_disk' => filled(env('AWS_ACCESS_KEY_ID'))
+        && filled(env('AWS_SECRET_ACCESS_KEY'))
+        && filled(env('AWS_DEFAULT_REGION'))
+        && filled(env('AWS_BUCKET')) ? 's3' : 'local',
+
     /*
     |--------------------------------------------------------------------------
     | Filesystem Disks

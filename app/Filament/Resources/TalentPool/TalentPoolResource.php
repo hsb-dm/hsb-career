@@ -12,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\SelectColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -44,7 +45,8 @@ class TalentPoolResource extends Resource
                 TextColumn::make('name')->searchable()->sortable(),
                 TextColumn::make('email')->searchable(),
                 TextColumn::make('area_of_interest')->label('Area of interest')->searchable()->sortable(),
-                TextColumn::make('created_at')->label('Submitted at')->dateTime('d M Y H:i')->sortable(),
+                SelectColumn::make('status')->label('Status')->options(TalentPoolEntry::STATUSES),
+                TextColumn::make('created_at')->label('Submitted at')->dateTime('d M Y H:i', 'Asia/Jakarta')->suffix(' WIB')->sortable(),
             ])
             ->recordActions([ViewAction::make()]);
     }
@@ -56,7 +58,8 @@ class TalentPoolResource extends Resource
                 TextEntry::make('name'),
                 TextEntry::make('email'),
                 TextEntry::make('area_of_interest')->label('Area of interest'),
-                TextEntry::make('created_at')->label('Submitted at')->dateTime('d M Y H:i'),
+                TextEntry::make('status')->label('Status')->formatStateUsing(fn (?string $state): string => TalentPoolEntry::STATUSES[$state] ?? 'Not set'),
+                TextEntry::make('created_at')->label('Submitted at')->dateTime('d M Y H:i', 'Asia/Jakarta')->suffix(' WIB'),
                 TextEntry::make('cv_path')->label('CV')->formatStateUsing(fn (?string $state): string => $state ? basename($state) : '-'),
             ])->columns(2),
         ]);

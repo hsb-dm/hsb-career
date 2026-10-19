@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <section class="recruitment-intro" aria-labelledby="recruitment-intro-title">
         <div class="recruitment-intro-copy">
-            <p class="recruitment-intro-eyebrow">Recruitment workspace <span aria-hidden="true">/</span> {{ now()->format('d M Y') }}</p>
+            <p class="recruitment-intro-eyebrow">Recruitment workspace <span aria-hidden="true">/</span> {{ now('Asia/Jakarta')->format('d M Y') }}</p>
             <h2 id="recruitment-intro-title">A clear view of your hiring pipeline.</h2>
             <p>Review applications, move candidates through each stage, and keep open roles on track.</p>
         </div>

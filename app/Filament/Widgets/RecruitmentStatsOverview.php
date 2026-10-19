@@ -6,11 +6,14 @@ use App\Enums\ApplicantStatus;
 use App\Enums\JobStatus;
 use App\Models\Applicant;
 use App\Models\Job;
+use App\Models\TalentPoolEntry;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class RecruitmentStatsOverview extends StatsOverviewWidget
 {
+    protected static ?int $sort = -2;
+
     protected ?string $heading = 'At a glance';
 
     protected ?string $description = 'Current activity across your vacancies and applicants.';
@@ -33,6 +36,9 @@ class RecruitmentStatsOverview extends StatsOverviewWidget
                 ->color('success'),
             Stat::make('Total applicants', (int) ($counts['total'] ?? 0))
                 ->description('Across all vacancies')
+                ->color('gray'),
+            Stat::make('Talent pool', TalentPoolEntry::query()->count())
+                ->description('Candidates in the talent pool')
                 ->color('gray'),
             Stat::make('AI ATS Screened', (int) ($counts['screened_count'] ?? 0))
                 ->description('Ready for review')

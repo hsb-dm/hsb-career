@@ -288,6 +288,10 @@ talentFile?.addEventListener('change', () => {
 
 const applicationForm = document.querySelector('.application-form');
 if (applicationForm) {
+    for (const salary of applicationForm.querySelectorAll('input[name$="_salary_answer"]')) {
+        salary.addEventListener('input', () => { salary.value = salary.value.replace(/\D/g, ''); });
+    }
+
     for (const otherField of applicationForm.querySelectorAll('[data-other-for]')) {
         const select = applicationForm.elements.namedItem(otherField.dataset.otherFor);
         const input = otherField.querySelector('input');
@@ -305,6 +309,16 @@ if (applicationForm) {
     const syncHealth = () => { healthDetails.required = healthAnswer.value === 'yes'; };
     healthAnswer.addEventListener('change', syncHealth);
     syncHealth();
+
+    const source = applicationForm.elements.namedItem('application_source');
+    const referralField = applicationForm.querySelector('[data-referral-field]');
+    const referralInput = applicationForm.elements.namedItem('referral_from');
+    const syncReferral = () => {
+        referralField.hidden = source.value !== 'Referral';
+        referralInput.required = !referralField.hidden;
+    };
+    source.addEventListener('change', syncReferral);
+    syncReferral();
 }
 
 const reducedPageMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
