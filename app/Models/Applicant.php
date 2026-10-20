@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\ApplicantStatus;
+use App\Mail\ApplicantRejected;
 use App\Support\CvStorage;
 use Database\Factories\ApplicantFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -25,6 +27,7 @@ use Illuminate\Support\Facades\Storage;
  * @property ApplicantStatus $status
  * @property string|null $hr_note
  * @property Carbon $applied_at
+ * @property Carbon|null $rejection_email_sent_at
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property-read Job $job
@@ -67,6 +70,12 @@ class Applicant extends Model
 
     protected static function booted(): void
     {
+        static::updated(function (self $applicant): void {
+            if ($applicant->wasChanged('status') && $applicant->status === ApplicantStatus::Rejected) {
+                $applicant->sendRejectionEmail();
+            }
+        });
+
         static::deleted(function (self $applicant): void {
             if ($disk = CvStorage::readDisk($applicant->cv_path)) {
                 Storage::disk($disk)->delete($applicant->cv_path);
@@ -80,6 +89,16 @@ class Applicant extends Model
     public function job(): BelongsTo
     {
         return $this->belongsTo(Job::class);
+    }
+
+    public function sendRejectionEmail(): void
+    {
+        if ($this->status !== ApplicantStatus::Rejected || blank($this->email) || $this->rejection_email_sent_at !== null) {
+            return;
+        }
+
+        Mail::to($this->email)->send(new ApplicantRejected($this->name, $this->job->title));
+        $this->forceFill(['rejection_email_sent_at' => now()])->saveQuietly();
     }
 
     public function salaryIncrease(): ?int
@@ -110,6 +129,7 @@ class Applicant extends Model
             'expected_salary' => 'integer',
             'status' => ApplicantStatus::class,
             'applied_at' => 'datetime',
+            'rejection_email_sent_at' => 'datetime',
             'current_age' => 'integer',
             'serious_disease' => 'boolean',
         ];

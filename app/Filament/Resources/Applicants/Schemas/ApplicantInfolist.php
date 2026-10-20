@@ -39,6 +39,12 @@ class ApplicantInfolist
                             ->badge()
                             ->formatStateUsing(fn (ApplicantStatus $state): string => $state->label())
                             ->color(fn (ApplicantStatus $state): string => $state->color()),
+                        TextEntry::make('rejection_email_sent_at')
+                            ->label('Rejection email sent at')
+                            ->dateTime('d M Y H:i', 'Asia/Jakarta')
+                            ->suffix(' WIB')
+                            ->placeholder('Not sent')
+                            ->visible(fn (Applicant $record): bool => $record->status === ApplicantStatus::Rejected),
                         TextEntry::make('current_salary')
                             ->label('Current salary')
                             ->state(fn (Applicant $record): string => Rupiah::format($record->current_salary)),

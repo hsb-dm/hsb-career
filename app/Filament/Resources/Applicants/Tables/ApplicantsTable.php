@@ -97,9 +97,7 @@ class ApplicantsTable
                                 ->required(),
                         ])
                         ->action(function (Collection $records, array $data): void {
-                            Applicant::query()
-                                ->whereKey($records->pluck('id'))
-                                ->update(['status' => $data['status']]);
+                            $records->each(fn (Applicant $record) => $record->update(['status' => $data['status']]));
 
                             Notification::make()
                                 ->title('Applicant statuses updated')
