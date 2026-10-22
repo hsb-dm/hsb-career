@@ -2927,7 +2927,7 @@ h1 span {
 
 .vacancies-hero .hero-image {
     width: 480px;
-    height: 369px;
+    height: auto;
     top: 6px;
     right: 0;
 }

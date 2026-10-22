@@ -45,8 +45,8 @@
                 <div class="hero-copy">
                     <h1 id="vacancies-hero-title">BUILD YOUR <span>CAREER</span><br>WITH CONFIDENCE</h1>
                 </div>
-                <img class="hero-image" src="{{ asset('images/home/hero.webp') }}"
-                    alt="Dua karyawan HSB membawa perangkat kerja" width="576" height="443" fetchpriority="high">
+                <img class="hero-image" src="{{ asset('images/vacancies/hero.webp') }}"
+                    alt="Dua karyawan HSB membawa perangkat kerja" width="992" height="578" fetchpriority="high">
             </div>
         </section>
 
