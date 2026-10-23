@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
  * @property string $name
  * @property string|null $email
  * @property string|null $phone
+ * @property Carbon|null $date_of_birth
  * @property int|null $current_salary
  * @property int|null $expected_salary
  * @property string|null $notice_period
@@ -45,6 +46,7 @@ use Illuminate\Support\Facades\Storage;
     'hr_note',
     'applied_at',
     'current_age',
+    'date_of_birth',
     'marital_status',
     'current_status',
     'current_domicile',
@@ -131,6 +133,7 @@ class Applicant extends Model
             'applied_at' => 'datetime',
             'rejection_email_sent_at' => 'datetime',
             'current_age' => 'integer',
+            'date_of_birth' => 'date',
             'serious_disease' => 'boolean',
         ];
     }

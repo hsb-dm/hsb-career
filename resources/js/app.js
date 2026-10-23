@@ -288,6 +288,9 @@ talentFile?.addEventListener('change', () => {
 
 const applicationForm = document.querySelector('.application-form');
 if (applicationForm) {
+    const dateOfBirth = applicationForm.elements.namedItem('date_of_birth');
+    dateOfBirth?.addEventListener('click', () => dateOfBirth.showPicker?.());
+
     for (const salary of applicationForm.querySelectorAll('input[name$="_salary_answer"]')) {
         salary.addEventListener('input', () => { salary.value = salary.value.replace(/\D/g, ''); });
     }

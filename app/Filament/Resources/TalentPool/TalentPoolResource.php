@@ -6,6 +6,7 @@ use App\Filament\Resources\TalentPool\Pages\ListTalentPoolEntries;
 use App\Filament\Resources\TalentPool\Pages\ViewTalentPoolEntry;
 use App\Models\TalentPoolEntry;
 use BackedEnum;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -48,7 +49,7 @@ class TalentPoolResource extends Resource
                 SelectColumn::make('status')->label('Status')->options(TalentPoolEntry::STATUSES),
                 TextColumn::make('created_at')->label('Submitted at')->dateTime('d M Y H:i', 'Asia/Jakarta')->suffix(' WIB')->sortable(),
             ])
-            ->recordActions([ViewAction::make()]);
+            ->recordActions([ViewAction::make(), DeleteAction::make()]);
     }
 
     public static function infolist(Schema $schema): Schema

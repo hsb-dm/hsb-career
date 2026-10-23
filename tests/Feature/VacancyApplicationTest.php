@@ -19,7 +19,7 @@ function applicationAnswers(): array
         'email' => 'ari@example.com',
         'phone' => '+62 812-3456-7890',
         'cv' => UploadedFile::fake()->create('resume.pdf', 100, 'application/pdf'),
-        'current_age' => 27,
+        'date_of_birth' => '1999-02-14',
         'marital_status' => 'Single',
         'current_status' => 'Still Working / employed',
         'current_domicile' => 'Jakarta Area',
@@ -54,6 +54,8 @@ test('apply page follows the screening form and submits to the selected job', fu
         ->assertSee('Reference Check Contact Details From Latest Company')
         ->assertSee('Where did you hear about this vacancy?')
         ->assertSee('Who referred you?')
+        ->assertSee('Date of Birth')
+        ->assertSee('name="date_of_birth" type="date"', false)
         ->assertSee('pattern="[0-9]{1,15}"', false)
         ->assertDontSee('class="awards-strip"', false)
         ->assertDontSee('Applying for Job Position');
@@ -69,6 +71,7 @@ test('apply page follows the screening form and submits to the selected job', fu
         ->and($applicant->status->value)->toBe('ai_ats_screened')
         ->and($applicant->email)->toBe('ari@example.com')
         ->and($applicant->phone)->toBe('+62 812-3456-7890')
+        ->and($applicant->date_of_birth->format('d/m/Y'))->toBe('14/02/1999')
         ->and($applicant->cv_path)->toStartWith('cvs/')
         ->and($applicant->current_salary)->toBe(8000000)
         ->and($applicant->expected_salary)->toBe(10000000)
@@ -84,6 +87,8 @@ test('apply page follows the screening form and submits to the selected job', fu
         ->assertSee('Budi, Manager, budi@example.com')
         ->assertSee('Rp10.000.000')
         ->assertSee('Budi Santoso');
+    $this->get(ApplicantResource::getUrl('view', ['record' => $applicant]))
+        ->assertSee('14/02/1999');
     $this->get(route('admin.applicants.cv.preview', $applicant))->assertOk();
 });
 
@@ -112,7 +117,7 @@ test('application validates required answers and other choices', function () {
 
     $this->from(route('vacancies.apply', $job->slug))
         ->post(route('vacancies.apply.store', $job->slug), [])
-        ->assertSessionHasErrors(['name', 'email', 'phone', 'cv', 'current_age', 'marital_status', 'latest_company_reference']);
+        ->assertSessionHasErrors(['name', 'email', 'phone', 'cv', 'date_of_birth', 'marital_status', 'latest_company_reference']);
 
     $this->from(route('vacancies.apply', $job->slug))
         ->post(route('vacancies.apply.store', $job->slug), [
@@ -160,20 +165,25 @@ test('application rejects invalid email and phone number', function () {
     expect(Applicant::query()->count())->toBe(0);
 });
 
-test('application rejects invalid age and choice with clear field errors', function () {
+test('application rejects invalid birth date and choice with clear field errors', function () {
     $job = Job::factory()->create(['status' => JobStatus::Active]);
 
     $this->followingRedirects()->from(route('vacancies.apply', $job->slug))
         ->post(route('vacancies.apply.store', $job->slug), [
             ...applicationAnswers(),
-            'current_age' => 0,
+            'date_of_birth' => '1999-02-31',
             'english_fluency' => 'Unknown level',
             'motivation' => str_repeat('A', 5001),
         ])
-        ->assertSee('Current Age must be between 1 and 120.')
-        ->assertSee('href="#current_age"', false)
-        ->assertSee('aria-describedby="current_age-error"', false)
-        ->assertSee('value="0"', false);
+        ->assertSee('Select a valid Date of Birth.')
+        ->assertSee('href="#date_of_birth"', false)
+        ->assertSee('aria-describedby="date_of_birth-error"', false)
+        ->assertSee('value="1999-02-31"', false);
+
+    $this->post(route('vacancies.apply.store', $job->slug), [
+        ...applicationAnswers(),
+        'date_of_birth' => now()->addDay()->toDateString(),
+    ])->assertSessionHasErrors('date_of_birth');
 
     expect(Applicant::query()->count())->toBe(0);
 });

@@ -9,7 +9,7 @@ class ScreeningForm
     /**
      * A single definition drives the public form and its server-side validation.
      *
-     * @return array<string, array<string, array{label: string, type: 'text'|'email'|'tel'|'textarea'|'number'|'file', required?: bool}|array{label: string, type: 'select', required: bool, options: array<string, string>}>>
+     * @return array<string, array<string, array{label: string, type: 'text'|'email'|'tel'|'textarea'|'file'|'date', required?: bool}|array{label: string, type: 'select', required: bool, options: array<string, string>}>>
      */
     public static function sections(): array
     {
@@ -19,7 +19,7 @@ class ScreeningForm
                 'email' => ['label' => 'Email Address', 'type' => 'email', 'required' => true],
                 'phone' => ['label' => 'Phone Number', 'type' => 'tel', 'required' => true],
                 'cv' => ['label' => 'CV / Resume (PDF, max 5 MB)', 'type' => 'file', 'required' => true],
-                'current_age' => ['label' => 'Current Age', 'type' => 'number', 'required' => true],
+                'date_of_birth' => ['label' => 'Date of Birth', 'type' => 'date', 'required' => true],
                 'marital_status' => ['label' => 'Marital Status', 'type' => 'select', 'required' => true, 'options' => self::options(['Single', 'Married'])],
                 'current_status' => ['label' => 'Current Status', 'type' => 'select', 'required' => true, 'options' => self::options(['Still Working / employed', 'Available / free / unemployed'])],
                 'current_domicile' => ['label' => 'Current Domicile', 'type' => 'select', 'required' => true, 'options' => self::options(['Jakarta Area', 'Bogor Area', 'Depok Area', 'Tangerang Area', 'Bekasi Area'])],
@@ -58,10 +58,6 @@ class ScreeningForm
                 $rules[$name] = [$required ? 'required' : 'nullable'];
 
                 switch ($field['type']) {
-                    case 'number':
-                        $rules[$name][] = 'integer';
-                        $rules[$name][] = 'between:1,120';
-                        break;
                     case 'select':
                         $options = array_keys($field['options']);
                         $allowsOther = $name !== 'serious_disease';
@@ -93,6 +89,7 @@ class ScreeningForm
         }
 
         $rules['serious_disease_details'][] = 'required_if:serious_disease,yes';
+        $rules['date_of_birth'] = ['required', 'date_format:Y-m-d', 'before_or_equal:'.now('Asia/Jakarta')->toDateString()];
         $rules['referral_from'] = ['required_if:application_source,Referral', 'exclude_unless:application_source,Referral', 'string', 'max:255'];
         foreach (['current_salary_answer', 'expected_salary_answer'] as $salary) {
             $rules[$salary][] = 'regex:/^[0-9]{1,15}$/D';
@@ -123,7 +120,8 @@ class ScreeningForm
     public static function messages(): array
     {
         $messages = [
-            'current_age.between' => 'Current Age must be between 1 and 120.',
+            'date_of_birth.date_format' => 'Select a valid Date of Birth.',
+            'date_of_birth.before_or_equal' => 'Date of Birth cannot be in the future.',
             'phone.regex' => 'Phone Number must be a valid phone number.',
             'cv.mimes' => 'Upload a PDF file for your CV / Resume.',
             'cv.max' => 'CV / Resume must be no larger than 5 MB.',

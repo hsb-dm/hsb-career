@@ -23,7 +23,8 @@ class ApplicantInfolist
                         TextEntry::make('name'),
                         TextEntry::make('email'),
                         TextEntry::make('phone'),
-                        TextEntry::make('current_age')->label('Current Age')->placeholder('-'),
+                        TextEntry::make('date_of_birth')->label('Date of Birth')->date('d/m/Y')->placeholder('-'),
+                        TextEntry::make('current_age')->label('Current Age')->visible(fn (Applicant $record): bool => $record->date_of_birth === null && $record->current_age !== null),
                         TextEntry::make('marital_status')->label('Marital Status')->placeholder('-'),
                         TextEntry::make('applied_at')
                             ->label('Applied at')

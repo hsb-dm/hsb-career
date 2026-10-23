@@ -1,6 +1,7 @@
 <?php
 
 use App\Filament\Resources\TalentPool\Pages\ListTalentPoolEntries;
+use App\Filament\Resources\TalentPool\Pages\ViewTalentPoolEntry;
 use App\Filament\Resources\TalentPool\TalentPoolResource;
 use App\Models\TalentPoolEntry;
 use App\Models\User;
@@ -124,4 +125,45 @@ test('HR can set either talent pool status', function () {
 
     expect($entry->fresh()->status)->toBe('contacted')
         ->and(array_values(TalentPoolEntry::STATUSES))->toBe(['No suitable opportunities', 'Contacted']);
+});
+
+test('HR can delete a talent pool entry and its CV', function () {
+    Storage::fake('local');
+    $path = UploadedFile::fake()->create('spam.pdf', 100, 'application/pdf')->store('talent-pool-cvs', 'local');
+    $entry = TalentPoolEntry::create([
+        'name' => 'Spam Candidate',
+        'email' => 'spam@example.com',
+        'area_of_interest' => 'Technology',
+        'cv_path' => $path,
+    ]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ViewTalentPoolEntry::class, ['record' => $entry->id])
+        ->assertActionVisible('delete')
+        ->callAction('delete')
+        ->assertHasNoErrors();
+
+    expect(TalentPoolEntry::query()->whereKey($entry->id)->exists())->toBeFalse();
+    Storage::disk('local')->assertMissing($path);
+});
+
+test('HR can delete a talent pool entry from the list when its CV is on S3', function () {
+    config()->set('filesystems.cv_disk', 's3');
+    Storage::fake('local');
+    Storage::fake('s3');
+    $path = UploadedFile::fake()->create('spam.pdf', 100, 'application/pdf')->store('talent-pool-cvs', 's3');
+    $entry = TalentPoolEntry::create([
+        'name' => 'Spam Candidate',
+        'email' => 'spam@example.com',
+        'area_of_interest' => 'Technology',
+        'cv_path' => $path,
+    ]);
+    $this->actingAs(User::factory()->create());
+
+    livewire(ListTalentPoolEntries::class)
+        ->callTableAction('delete', $entry)
+        ->assertHasNoErrors();
+
+    expect(TalentPoolEntry::query()->whereKey($entry->id)->exists())->toBeFalse();
+    Storage::disk('s3')->assertMissing($path);
 });

@@ -3608,6 +3608,11 @@ h1 span {
     cursor: pointer;
 }
 
+.application-field input[type="date"] {
+    color-scheme: dark;
+    cursor: pointer;
+}
+
 .application-field input[type="file"]::file-selector-button {
     margin-right: 14px;
     border: 0;

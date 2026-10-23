@@ -6,6 +6,7 @@ use App\Filament\Resources\TalentPool\TalentPoolResource;
 use App\Models\TalentPoolEntry;
 use App\Support\CvStorage;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +19,7 @@ class ViewTalentPoolEntry extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            DeleteAction::make(),
             Action::make('downloadCv')
                 ->label('Download CV')
                 ->icon('heroicon-o-arrow-down-tray')
