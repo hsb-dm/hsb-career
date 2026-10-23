@@ -72,12 +72,6 @@ class Applicant extends Model
 
     protected static function booted(): void
     {
-        static::updated(function (self $applicant): void {
-            if ($applicant->wasChanged('status') && $applicant->status === ApplicantStatus::Rejected) {
-                $applicant->sendRejectionEmail();
-            }
-        });
-
         static::deleted(function (self $applicant): void {
             if ($disk = CvStorage::readDisk($applicant->cv_path)) {
                 Storage::disk($disk)->delete($applicant->cv_path);

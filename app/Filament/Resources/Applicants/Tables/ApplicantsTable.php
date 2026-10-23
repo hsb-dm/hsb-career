@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
 use App\Filament\Resources\Applicants\Actions\ApplicantViewAction;
+use App\Filament\Resources\Applicants\Actions\SendRejectionEmailAction;
 use App\Models\Applicant;
 use App\Support\Rupiah;
 use Filament\Actions\BulkAction;
@@ -85,6 +86,7 @@ class ApplicantsTable
             ])
             ->recordActions([
                 ApplicantViewAction::make(),
+                SendRejectionEmailAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([

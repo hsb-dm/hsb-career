@@ -30,7 +30,7 @@ test('rejection email is personal, formal, and names the vacancy', function () {
         ->assertDontSeeInText('Dashboard');
 });
 
-test('HR sends one rejection email when changing status from the detail page', function () {
+test('changing status to rejected reveals a manual email action on the detail page', function () {
     $job = Job::factory()->create(['title' => 'QA Engineer']);
     $applicant = Applicant::factory()->create([
         'job_id' => $job->id,
@@ -42,7 +42,16 @@ test('HR sends one rejection email when changing status from the detail page', f
 
     livewire(ViewApplicant::class, ['record' => $applicant->id])
         ->callAction('updateStatus', ['status' => ApplicantStatus::Rejected->value])
-        ->assertHasNoErrors();
+        ->assertHasNoErrors()
+        ->assertActionVisible('sendRejectionEmail');
+
+    Mail::assertNothingSent();
+    expect($applicant->fresh()->rejection_email_sent_at)->toBeNull();
+
+    livewire(ViewApplicant::class, ['record' => $applicant->id])
+        ->callAction('sendRejectionEmail')
+        ->assertHasNoErrors()
+        ->assertActionHidden('sendRejectionEmail');
 
     Mail::assertSent(ApplicantRejected::class, fn (ApplicantRejected $mail) => $mail->hasTo('ari@example.com')
         && $mail->candidateName === 'Ari Candidate'
@@ -57,7 +66,7 @@ test('HR sends one rejection email when changing status from the detail page', f
     Mail::assertSentCount(1);
 });
 
-test('table and bulk status changes send only to applicants with an email', function () {
+test('table and bulk status changes never send emails, and only eligible rows show the send action', function () {
     $first = Applicant::factory()->create(['status' => ApplicantStatus::AiAtsScreened]);
     $second = Applicant::factory()->create(['status' => ApplicantStatus::AiAtsScreened]);
     $withoutEmail = Applicant::factory()->create(['status' => ApplicantStatus::AiAtsScreened, 'email' => null]);
@@ -71,10 +80,21 @@ test('table and bulk status changes send only to applicants with an email', func
         ->callTableBulkAction('updateStatus', [$first, $second, $withoutEmail], ['status' => ApplicantStatus::Rejected->value])
         ->assertHasNoErrors();
 
-    Mail::assertSentCount(2);
-    expect($first->fresh()->rejection_email_sent_at)->not->toBeNull()
-        ->and($second->fresh()->rejection_email_sent_at)->not->toBeNull()
+    Mail::assertNothingSent();
+    expect($first->fresh()->rejection_email_sent_at)->toBeNull()
+        ->and($second->fresh()->rejection_email_sent_at)->toBeNull()
         ->and($withoutEmail->fresh()->rejection_email_sent_at)->toBeNull();
+
+    livewire(ListApplicants::class)
+        ->assertTableActionVisible('sendRejectionEmail', $first)
+        ->assertTableActionVisible('sendRejectionEmail', $second)
+        ->assertTableActionHidden('sendRejectionEmail', $withoutEmail)
+        ->callTableAction('sendRejectionEmail', $first)
+        ->assertHasNoErrors()
+        ->assertTableActionHidden('sendRejectionEmail', $first);
+
+    Mail::assertSentCount(1);
+    expect($first->fresh()->rejection_email_sent_at)->not->toBeNull();
 });
 
 test('HR can send a rejection email for an already rejected applicant who has not received one', function () {
@@ -96,11 +116,15 @@ test('a failed SMTP send leaves a retry available', function () {
     $mailManager = Mail::getFacadeRoot()->manager;
     Mail::shouldReceive('to')->once()->andThrow(new RuntimeException('SMTP unavailable'));
 
-    expect(fn () => $applicant->update(['status' => ApplicantStatus::Rejected]))
-        ->toThrow(RuntimeException::class, 'SMTP unavailable');
+    $applicant->update(['status' => ApplicantStatus::Rejected]);
 
     expect($applicant->fresh()->status)->toBe(ApplicantStatus::Rejected)
         ->and($applicant->rejection_email_sent_at)->toBeNull();
+
+    expect(fn () => $applicant->sendRejectionEmail())
+        ->toThrow(RuntimeException::class, 'SMTP unavailable');
+
+    expect($applicant->fresh()->rejection_email_sent_at)->toBeNull();
 
     Mail::swap($mailManager);
     Mail::fake();
