@@ -165,6 +165,20 @@ test('application rejects invalid email and phone number', function () {
     expect(Applicant::query()->count())->toBe(0);
 });
 
+test('application accepts Indonesian mobile numbers with 08, 62, and +62 prefixes', function () {
+    $job = Job::factory()->create(['status' => JobStatus::Active]);
+
+    foreach (['085156525390', '6285156525390', '+6285156525390'] as $phone) {
+        $this->post(route('vacancies.apply.store', $job->slug), [
+            ...applicationAnswers(),
+            'phone' => $phone,
+        ])->assertSessionHasNoErrors();
+    }
+
+    expect(Applicant::query()->orderBy('id')->pluck('phone')->all())
+        ->toBe(['085156525390', '6285156525390', '+6285156525390']);
+});
+
 test('application rejects invalid birth date and choice with clear field errors', function () {
     $job = Job::factory()->create(['status' => JobStatus::Active]);
 
