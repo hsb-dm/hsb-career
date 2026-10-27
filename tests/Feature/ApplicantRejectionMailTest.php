@@ -24,7 +24,9 @@ test('rejection email is personal, formal, and names the vacancy', function () {
     $mail->assertHasSubject('Update on Your Application for QA Engineer | HSB Investasi')
         ->assertSeeInHtml('Dear Ari Candidate,')
         ->assertSeeInHtml('QA Engineer')
-        ->assertSeeInHtml('we will not be moving forward with your candidacy')
+        ->assertSeeInHtml('After carefully reviewing your application, we regret to inform you')
+        ->assertSeeInHtml('With your permission, we would like to keep your profile in our talent pool database')
+        ->assertSeeInText('hope to have the opportunity to connect with you again in the future')
         ->assertSeeInText('HSB Investasi Recruitment Team')
         ->assertDontSeeInHtml('Dashboard')
         ->assertDontSeeInText('Dashboard');
