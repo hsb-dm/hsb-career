@@ -6,10 +6,8 @@ use App\Enums\EmploymentType;
 use App\Enums\JobStatus;
 use App\Enums\WorkArrangement;
 use App\Models\Job;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
@@ -19,10 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::query()->firstOrCreate(
-            ['email' => 'admin@example.com'],
-            ['name' => 'HR Admin', 'password' => Hash::make('password')],
-        );
+        $this->call(AdminUserSeeder::class);
 
         $jobs = [
             ['Legal & Compliance Manager', 'Compliance'],

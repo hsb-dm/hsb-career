@@ -20,6 +20,20 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: hsb_jobs_test
+          POSTGRES_USER: hsb_jobs
+          POSTGRES_PASSWORD: test-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U hsb_jobs -d hsb_jobs_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     strategy:
       matrix:
         php-version: ['8.3.36', '8.4.27', '8.5.12']
@@ -36,6 +50,7 @@ jobs:
           php-version: ${{ matrix.php-version }}
           tools: composer:v2
           coverage: xdebug
+          extensions: pdo_pgsql
 
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
@@ -64,4 +79,11 @@ jobs:
         run: composer types:check
 
       - name: Run Tests
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 5432
+          DB_DATABASE: hsb_jobs_test
+          DB_USERNAME: hsb_jobs
+          DB_PASSWORD: test-password
         run: php artisan test

@@ -6,6 +6,7 @@ use Carbon\CarbonImmutable;
 use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -16,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Route::pattern('record', '[0-9]+');
     }
 
     /**

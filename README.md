@@ -1,13 +1,13 @@
 # HSB HR Dashboard
 
-An internal HR dashboard for managing job vacancies and applicants, built with Laravel, Filament, Livewire, Blade, and MySQL.
+An internal HR dashboard for managing job vacancies and applicants, built with Laravel, Filament, Livewire, Blade, and PostgreSQL.
 
 ## Requirements
 
 - PHP 8.3.36+, 8.4.27+, or 8.5.12+ within those minor releases
 - Composer
 - Node.js and npm
-- Docker for a local MySQL instance, or an existing MySQL 8 installation
+- Docker for a local PostgreSQL instance, or an existing PostgreSQL 17 installation
 
 ## Setup
 
@@ -15,6 +15,7 @@ An internal HR dashboard for managing job vacancies and applicants, built with L
 composer install
 npm install
 cp .env.example .env
+# Set INITIAL_ADMIN_PASSWORD in .env before seeding.
 php artisan key:generate
 docker compose up -d
 php artisan migrate:fresh --seed
@@ -49,29 +50,22 @@ ngrok http 8000
 
 When `public/hot` exists, Laravel loads CSS and JavaScript from Vite at `localhost:5173`, which visitors cannot access through ngrok. The local application trusts HTTPS headers only from loopback proxies so generated asset URLs use `https://`.
 
-Development credentials:
-
-```text
-Email: admin@example.com
-Password: password
-```
-
-These credentials are for development only and are created by the database seeder.
+Set `INITIAL_ADMIN_PASSWORD` in `.env` before running the seeder. It creates the admin account at `INITIAL_ADMIN_EMAIL` (default `hr@hsb.co.id`). The password is kept out of tracked files.
 
 ## Database
 
-The default `.env.example` configuration uses MySQL:
+The default `.env.example` configuration uses PostgreSQL:
 
 ```env
-DB_CONNECTION=mysql
+DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
-DB_PORT=3306
+DB_PORT=5432
 DB_DATABASE=hsb_jobs
 DB_USERNAME=hsb_jobs
 DB_PASSWORD=secret
 ```
 
-`docker-compose.yml` runs MySQL 8.4 with the persistent `mysql-data` volume.
+`docker-compose.yml` runs PostgreSQL 17 with the persistent `postgres-data` volume. Existing MySQL data is not migrated automatically; keep the old volume until its data has been transferred and verified.
 
 ## Storage
 

@@ -4,6 +4,11 @@ use App\Models\User;
 
 return [
 
+    'initial_admin' => [
+        'email' => env('INITIAL_ADMIN_EMAIL', 'hr@hsb.co.id'),
+        'password' => env('INITIAL_ADMIN_PASSWORD'),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults

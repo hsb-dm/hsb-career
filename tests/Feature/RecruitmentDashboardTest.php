@@ -20,6 +20,7 @@ use Database\Seeders\DatabaseSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 
@@ -385,7 +386,8 @@ test('database seeder runs without errors', function () {
         ->and(Job::query()->where('status', JobStatus::Active)->count())->toBe(10)
         ->and(Job::query()->where('title', 'Legal & Compliance Manager')->firstOrFail()->description)->toContain('Key Responsibilities')
         ->and(Job::query()->where('title', 'Legal & Compliance Manager')->firstOrFail()->published_at->format('M d, Y'))->toBe('Sep 29, 2026')
-        ->and(User::query()->where('email', 'admin@example.com')->exists())->toBeTrue();
+        ->and(User::query()->where('email', 'hr@hsb.co.id')->exists())->toBeTrue()
+        ->and(Hash::check('test-only-password', User::query()->where('email', 'hr@hsb.co.id')->firstOrFail()->password))->toBeTrue();
 });
 
 test('missing dummy cv path does not break applicant detail page', function () {

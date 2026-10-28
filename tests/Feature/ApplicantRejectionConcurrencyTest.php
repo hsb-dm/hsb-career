@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 
-test('a second MySQL connection cannot send while the first holds the applicant row', function () {
-    if (DB::getDriverName() !== 'mysql' || ! str_ends_with((string) config('database.connections.mysql.database'), '_test')) {
-        $this->markTestSkipped('Requires an isolated MySQL database ending in _test.');
+test('a second PostgreSQL connection cannot send while the first holds the applicant row', function () {
+    if (DB::getDriverName() !== 'pgsql' || ! str_ends_with((string) config('database.connections.pgsql.database'), '_test')) {
+        $this->markTestSkipped('Requires an isolated PostgreSQL database ending in _test.');
     }
 
     Artisan::call('migrate', ['--force' => true]);
@@ -21,7 +21,7 @@ test('a second MySQL connection cannot send while the first holds the applicant 
         'status' => ApplicantStatus::Rejected,
         'cv_path' => null,
     ]);
-    config()->set('database.connections.mail_lock_probe', config('database.connections.mysql'));
+    config()->set('database.connections.mail_lock_probe', config('database.connections.pgsql'));
     DB::purge('mail_lock_probe');
     $blocked = false;
 
@@ -33,7 +33,7 @@ test('a second MySQL connection cannot send while the first holds the applicant 
                 ->lock('FOR UPDATE NOWAIT')
                 ->first());
         } catch (QueryException $exception) {
-            $blocked = (int) ($exception->errorInfo[1] ?? 0) === 3572;
+            $blocked = $exception->getCode() === '55P03';
         }
     });
 

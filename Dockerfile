@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
 FROM php:8.4.27-fpm-alpine AS php-base
-RUN apk add --no-cache icu-libs libzip libpng libjpeg-turbo freetype \
-    && apk add --no-cache --virtual .php-build-deps $PHPIZE_DEPS icu-dev libzip-dev libpng-dev libjpeg-turbo-dev freetype-dev \
+RUN apk add --no-cache icu-libs libzip libpng libjpeg-turbo freetype libpq \
+    && apk add --no-cache --virtual .php-build-deps $PHPIZE_DEPS icu-dev libzip-dev libpng-dev libjpeg-turbo-dev freetype-dev libpq-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl opcache pdo_mysql zip \
+    && docker-php-ext-install -j"$(nproc)" bcmath exif gd intl opcache pdo_pgsql zip \
     && apk del .php-build-deps
 COPY docker/php-production.ini /usr/local/etc/php/conf.d/production.ini
 COPY docker/php-fpm.conf /usr/local/etc/php-fpm.d/zz-production.conf
