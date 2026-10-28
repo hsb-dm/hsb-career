@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM php:8.4-fpm-alpine AS php-base
+FROM php:8.4.27-fpm-alpine AS php-base
 RUN apk add --no-cache icu-libs libzip libpng libjpeg-turbo freetype \
     && apk add --no-cache --virtual .php-build-deps $PHPIZE_DEPS icu-dev libzip-dev libpng-dev libjpeg-turbo-dev freetype-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \

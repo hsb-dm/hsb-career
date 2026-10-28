@@ -4,7 +4,7 @@ An internal HR dashboard for managing job vacancies and applicants, built with L
 
 ## Requirements
 
-- PHP 8.4+
+- PHP 8.3.36+, 8.4.27+, or 8.5.12+ within those minor releases
 - Composer
 - Node.js and npm
 - Docker for a local MySQL instance, or an existing MySQL 8 installation

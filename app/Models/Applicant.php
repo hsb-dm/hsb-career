@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 /**
  * @property int $id
@@ -87,14 +89,24 @@ class Applicant extends Model
         return $this->belongsTo(Job::class);
     }
 
-    public function sendRejectionEmail(): void
+    public function sendRejectionEmail(): bool
     {
-        if ($this->status !== ApplicantStatus::Rejected || blank($this->email) || $this->rejection_email_sent_at !== null) {
-            return;
-        }
+        return DB::transaction(function (): bool {
+            $applicant = static::query()->whereKey($this->getKey())->lockForUpdate()->firstOrFail();
+            if ($applicant->status !== ApplicantStatus::Rejected || blank($applicant->email) || $applicant->rejection_email_sent_at !== null) {
+                return false;
+            }
 
-        Mail::to($this->email)->send(new ApplicantRejected($this->name, $this->job->title));
-        $this->forceFill(['rejection_email_sent_at' => now()])->saveQuietly();
+            if (app()->isProduction() && in_array(config('mail.default'), ['log', 'array', 'failover'], true)) {
+                throw new RuntimeException('Configure a delivery mailer before sending rejection emails.');
+            }
+
+            Mail::to($applicant->email)->send(new ApplicantRejected($applicant->name, $applicant->job->title));
+            $applicant->forceFill(['rejection_email_sent_at' => now()])->saveQuietly();
+            $this->rejection_email_sent_at = $applicant->rejection_email_sent_at;
+
+            return true;
+        });
     }
 
     public function salaryIncrease(): ?int

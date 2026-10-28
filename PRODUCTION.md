@@ -14,6 +14,8 @@ Set `APP_URL` to the Tunnel HTTPS hostname, then replace `DB_PASSWORD` and `DB_R
 php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'
 ```
 
+Set `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, and `MAIL_FROM_ADDRESS` to the values from your mail provider. Send a test rejection email before using the dashboard for candidates. The production example uses SMTP; a log or array mailer cannot deliver rejection emails.
+
 Do not change `APP_KEY` after user data exists because existing sessions and encrypted data may become unreadable. Keep a secure copy of `.env.production` and regularly back up the `mysql-data` and `cv-data` volumes. `.env.production` is excluded from Git and the Docker images.
 
 ## Start the stack
@@ -21,7 +23,7 @@ Do not change `APP_KEY` after user data exists because existing sessions and enc
 Run all commands from the repository directory:
 
 ```bash
-docker compose --env-file .env.production -f compose.production.yaml build
+docker compose --env-file .env.production -f compose.production.yaml build --pull
 docker compose --env-file .env.production -f compose.production.yaml up -d mysql
 docker compose --env-file .env.production -f compose.production.yaml run --rm app php artisan migrate --force
 docker compose --env-file .env.production -f compose.production.yaml up -d app web
@@ -29,7 +31,11 @@ docker compose --env-file .env.production -f compose.production.yaml up -d app w
 
 Check `http://127.0.0.1:8181/up` and the home page. A Cloudflare Tunnel running on the same host can use **`http://127.0.0.1:8181`** as its origin service. The Tunnel uses local HTTP while visitors use the HTTPS hostname configured in `APP_URL`. Make sure the public hostname forwarded by the Tunnel matches the hostname in `APP_URL`.
 
+Verify the running app reports PHP 8.4.27 or newer: `docker compose --env-file .env.production -f compose.production.yaml exec app php -v`.
+
 Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8181`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
+
+Nginx uses Cloudflare's `CF-Connecting-IP` only for requests from Docker's `172.16.0.0/12` bridge range. Keep the origin reachable only through the Tunnel. If your Docker network or Tunnel host uses another range, update `set_real_ip_from` in `docker/nginx.conf` to that specific source before deploying; otherwise all visitors share a submission rate limit.
 
 ## UAT demo data
 
@@ -44,7 +50,7 @@ The demo administrator credentials are `admin@example.com` and `password`. Do no
 ## Updates
 
 ```bash
-docker compose --env-file .env.production -f compose.production.yaml build
+docker compose --env-file .env.production -f compose.production.yaml build --pull
 docker compose --env-file .env.production -f compose.production.yaml run --rm app php artisan migrate --force
 docker compose --env-file .env.production -f compose.production.yaml up -d app web
 ```

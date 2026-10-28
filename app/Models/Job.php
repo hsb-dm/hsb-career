@@ -5,13 +5,13 @@ namespace App\Models;
 use App\Enums\EmploymentType;
 use App\Enums\JobStatus;
 use App\Enums\WorkArrangement;
+use Carbon\CarbonInterface;
 use Database\Factories\JobFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
@@ -24,10 +24,10 @@ use Illuminate\Support\Str;
  * @property WorkArrangement $work_arrangement
  * @property string $description
  * @property JobStatus $status
- * @property Carbon|null $published_at
- * @property Carbon|null $closed_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $published_at
+ * @property CarbonInterface|null $closed_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Fillable([
     'title',

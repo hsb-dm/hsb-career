@@ -4,7 +4,6 @@ namespace App\Filament\Resources\Applicants;
 
 use App\Filament\Resources\Applicants\Pages\ListApplicants;
 use App\Filament\Resources\Applicants\Pages\ViewApplicant;
-use App\Filament\Resources\Applicants\Schemas\ApplicantForm;
 use App\Filament\Resources\Applicants\Schemas\ApplicantInfolist;
 use App\Filament\Resources\Applicants\Tables\ApplicantsTable;
 use App\Models\Applicant;
@@ -26,11 +25,6 @@ class ApplicantResource extends Resource
     protected static ?int $navigationSort = 2;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function form(Schema $schema): Schema
-    {
-        return ApplicantForm::configure($schema);
-    }
 
     public static function infolist(Schema $schema): Schema
     {

@@ -138,3 +138,31 @@ test('a failed SMTP send leaves a retry available', function () {
 
     Mail::assertSentCount(1);
 });
+
+test('a stale applicant record cannot send the same rejection twice', function () {
+    $applicant = Applicant::factory()->create(['status' => ApplicantStatus::Rejected]);
+    $secondRequest = $applicant->fresh();
+
+    expect($applicant->sendRejectionEmail())->toBeTrue();
+    expect($secondRequest->sendRejectionEmail())->toBeFalse();
+
+    Mail::assertSentCount(1);
+});
+
+test('production refuses a mailer that only logs rejection emails', function () {
+    $this->app->instance('env', 'production');
+    config()->set('mail.default', 'log');
+    $applicant = Applicant::factory()->create(['status' => ApplicantStatus::Rejected]);
+
+    expect(fn () => $applicant->sendRejectionEmail())
+        ->toThrow(RuntimeException::class, 'Configure a delivery mailer');
+
+    Mail::assertNothingSent();
+    expect($applicant->fresh()->rejection_email_sent_at)->toBeNull();
+
+    $this->actingAs(User::factory()->create());
+    livewire(ViewApplicant::class, ['record' => $applicant->id])
+        ->callAction('sendRejectionEmail')
+        ->assertHasNoErrors()
+        ->assertNotified('Rejection email could not be sent');
+});

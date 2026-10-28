@@ -6,6 +6,7 @@ use App\Enums\ApplicantStatus;
 use App\Models\Applicant;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
+use RuntimeException;
 
 class SendRejectionEmailAction
 {
@@ -19,8 +20,20 @@ class SendRejectionEmailAction
                 && filled($record->email)
                 && $record->rejection_email_sent_at === null)
             ->action(function (Applicant $record): void {
-                $record->sendRejectionEmail();
-                Notification::make()->title('Rejection email sent')->success()->send();
+                try {
+                    $sent = $record->sendRejectionEmail();
+                } catch (RuntimeException $exception) {
+                    report($exception);
+                    Notification::make()->title('Rejection email could not be sent')->danger()->send();
+
+                    return;
+                }
+
+                if ($sent) {
+                    Notification::make()->title('Rejection email sent')->success()->send();
+                } else {
+                    Notification::make()->title('Rejection email was not sent')->warning()->send();
+                }
             });
     }
 }

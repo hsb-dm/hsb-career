@@ -9,6 +9,7 @@ use App\Filament\Resources\Applicants\ApplicantResource;
 use App\Filament\Resources\Applicants\Pages\ListApplicants;
 use App\Filament\Resources\Applicants\Pages\ViewApplicant;
 use App\Filament\Resources\Jobs\Pages\CreateJob;
+use App\Filament\Resources\Jobs\Pages\EditJob;
 use App\Filament\Widgets\RecentApplicants;
 use App\Filament\Widgets\RecruitmentStatsOverview;
 use App\Models\Applicant;
@@ -108,11 +109,11 @@ test('admin can view jobs list', function () {
 
 test('admin can create job', function () {
     $this->actingAs(User::factory()->create());
+    Job::factory()->create(['title' => 'Frontend Engineer', 'slug' => 'frontend-engineer']);
 
     livewire(CreateJob::class)
         ->fillForm([
             'title' => 'Frontend Engineer',
-            'slug' => 'frontend-engineer',
             'department' => 'Engineering',
             'location' => 'Jakarta',
             'employment_type' => EmploymentType::FullTime->value,
@@ -127,9 +128,43 @@ test('admin can create job', function () {
 
     assertDatabaseHas(Job::class, [
         'title' => 'Frontend Engineer',
-        'slug' => 'frontend-engineer',
+        'slug' => 'frontend-engineer-2',
         'status' => JobStatus::Active->value,
     ]);
+});
+
+test('editing a job title keeps its public URL', function () {
+    $job = Job::factory()->create(['title' => 'QA Engineer', 'slug' => 'qa-engineer']);
+    $this->actingAs(User::factory()->create());
+
+    livewire(EditJob::class, ['record' => $job->id])
+        ->fillForm(['title' => 'Senior QA Engineer'])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($job->fresh()->slug)->toBe('qa-engineer');
+    $this->get(route('vacancies.show', 'qa-engineer'))->assertOk()->assertSee('Senior QA Engineer');
+});
+
+test('jobs can be deleted only before they receive applicants', function () {
+    $job = Job::factory()->create();
+    Applicant::factory()->create(['job_id' => $job->id]);
+    $emptyJob = Job::factory()->create();
+    $this->actingAs(User::factory()->create());
+
+    livewire(EditJob::class, ['record' => $job->id])
+        ->assertActionHidden('delete')
+        ->assertActionExists('delete', fn ($action) => $action->isDisabled())
+        ->call('mountAction', 'delete')
+        ->assertHasNoErrors();
+    livewire(EditJob::class, ['record' => $emptyJob->id])
+        ->assertActionVisible('delete')
+        ->assertActionEnabled('delete')
+        ->callAction('delete')
+        ->assertHasNoErrors();
+
+    expect(Job::query()->whereKey($job->id)->exists())->toBeTrue()
+        ->and(Job::query()->whereKey($emptyJob->id)->exists())->toBeFalse();
 });
 
 test('admin can view applicants list', function () {
@@ -331,8 +366,8 @@ test('database seeder runs without errors', function () {
     $this->seed(DatabaseSeeder::class);
 
     expect(Job::query()->count())->toBe(10)
-        ->and(Applicant::query()->count())->toBe(50)
-        ->and(TalentPoolEntry::query()->count())->toBe(5)
+        ->and(Applicant::query()->count())->toBe(0)
+        ->and(TalentPoolEntry::query()->count())->toBe(0)
         ->and(Job::query()->orderByDesc('published_at')->pluck('title')->all())->toBe([
             'Legal & Compliance Manager',
             'IT Manager',
