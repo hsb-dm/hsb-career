@@ -109,6 +109,8 @@ Some applicants intentionally reference missing sample paths to exercise the emp
 - Seeder:
   - 10 jobs
   - 1 HR admin account
+- Users resource:
+  - add users and update their names, emails, or passwords
 
 ## Tests
 

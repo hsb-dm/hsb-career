@@ -9,7 +9,7 @@ if [ ! -f .env.production ]; then
 fi
 
 compose() {
-    docker compose --env-file .env.production -f compose.production.yaml "$@"
+    sudo docker compose --env-file .env.production -f compose.production.yaml "$@"
 }
 
 compose config --quiet

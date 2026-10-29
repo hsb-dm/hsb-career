@@ -20,7 +20,7 @@ Do not change `APP_KEY` after user data exists because existing sessions and enc
 
 ## Start the stack
 
-After filling `.env.production`, deploy from the repository directory with one command. The script builds the images, starts PostgreSQL, applies pending migrations, creates the initial admin if it does not exist, and starts the app and web server:
+After filling `.env.production`, deploy from the repository directory with one command. The script uses `sudo` for Docker, builds the images, starts PostgreSQL, applies pending migrations, creates the initial admin if it does not exist, and starts the app and web server. It does not add demo vacancies:
 
 ```bash
 ./deploy.sh
@@ -39,7 +39,7 @@ Nginx uses Cloudflare's `CF-Connecting-IP` only for requests from Docker's `172.
 The default seeder creates the administrator account and demo vacancies for UAT:
 
 ```bash
-docker compose --env-file .env.production -f compose.production.yaml exec app php artisan db:seed --force
+sudo docker compose --env-file .env.production -f compose.production.yaml exec app php artisan db:seed --force
 ```
 
 Use the credentials configured in `INITIAL_ADMIN_EMAIL` and `INITIAL_ADMIN_PASSWORD`. Do not run the demo vacancy seeder on a live production database.
