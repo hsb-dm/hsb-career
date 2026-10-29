@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Carbon\CarbonImmutable;
+use Filament\Actions\Exports\ExportColumn;
 use Filament\Support\Facades\FilamentTimezone;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Date::use(CarbonImmutable::class);
         FilamentTimezone::set('Asia/Jakarta');
+        ExportColumn::configureUsing(fn (ExportColumn $column) => $column->preventFormulaInjection());
 
         DB::prohibitDestructiveCommands(
             app()->isProduction(),

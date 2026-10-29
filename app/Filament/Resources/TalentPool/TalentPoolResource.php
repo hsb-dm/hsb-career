@@ -2,11 +2,15 @@
 
 namespace App\Filament\Resources\TalentPool;
 
+use App\Filament\Exports\TalentPoolEntryExporter;
 use App\Filament\Resources\TalentPool\Pages\ListTalentPoolEntries;
 use App\Filament\Resources\TalentPool\Pages\ViewTalentPoolEntry;
 use App\Models\TalentPoolEntry;
 use BackedEnum;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
@@ -49,7 +53,17 @@ class TalentPoolResource extends Resource
                 SelectColumn::make('status')->label('Status')->options(TalentPoolEntry::STATUSES),
                 TextColumn::make('created_at')->label('Submitted at')->dateTime('d M Y H:i', 'Asia/Jakarta')->suffix(' WIB')->sortable(),
             ])
-            ->recordActions([ViewAction::make(), DeleteAction::make()]);
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(TalentPoolEntryExporter::class)
+                    ->formats([ExportFormat::Csv, ExportFormat::Xlsx]),
+            ])
+            ->recordActions([ViewAction::make(), DeleteAction::make()])
+            ->toolbarActions([
+                ExportBulkAction::make()
+                    ->exporter(TalentPoolEntryExporter::class)
+                    ->formats([ExportFormat::Csv, ExportFormat::Xlsx]),
+            ]);
     }
 
     public static function infolist(Schema $schema): Schema

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Applicants\Tables;
 
 use App\Enums\ApplicantStatus;
+use App\Filament\Exports\ApplicantExporter;
 use App\Filament\Resources\Applicants\Actions\ApplicantViewAction;
 use App\Filament\Resources\Applicants\Actions\SendRejectionEmailAction;
 use App\Models\Applicant;
@@ -11,6 +12,9 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
@@ -84,6 +88,11 @@ class ApplicantsTable
                         ->when($data['from'] ?? null, fn (Builder $query, string $date) => $query->where('applied_at', '>=', Carbon::parse($date, 'Asia/Jakarta')->startOfDay()->utc()))
                         ->when($data['until'] ?? null, fn (Builder $query, string $date) => $query->where('applied_at', '<=', Carbon::parse($date, 'Asia/Jakarta')->endOfDay()->utc()))),
             ])
+            ->headerActions([
+                ExportAction::make()
+                    ->exporter(ApplicantExporter::class)
+                    ->formats([ExportFormat::Csv, ExportFormat::Xlsx]),
+            ])
             ->recordActions([
                 ApplicantViewAction::make(),
                 SendRejectionEmailAction::make(),
@@ -91,6 +100,9 @@ class ApplicantsTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
+                    ExportBulkAction::make()
+                        ->exporter(ApplicantExporter::class)
+                        ->formats([ExportFormat::Csv, ExportFormat::Xlsx]),
                     BulkAction::make('updateStatus')
                         ->label('Update status')
                         ->schema([
