@@ -69,7 +69,7 @@ DB_PASSWORD=secret
 
 ## Storage
 
-CV files use the `local` disk at `storage/app/private` while any AWS S3 setting (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_DEFAULT_REGION`, or `AWS_BUCKET`) is empty. When all four are set, new CV uploads use the `s3` disk. Keep the bucket private.
+CV files use the `local` disk at `storage/app/private` until `AWS_DEFAULT_REGION` and `AWS_BUCKET` are both set. Then new CV uploads use the `s3` disk. On EC2, attach an IAM role with access to the private bucket and leave `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unset. The AWS SDK obtains temporary credentials from the instance role.
 
 Existing local CVs remain available to the admin panel. If S3 credentials are removed later, CVs stored on S3 cannot be read until access is restored.
 

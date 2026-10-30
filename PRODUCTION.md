@@ -16,6 +16,8 @@ php -r 'echo "base64:".base64_encode(random_bytes(32)).PHP_EOL;'
 
 Set `MAIL_HOST`, `MAIL_USERNAME`, `MAIL_PASSWORD`, and `MAIL_FROM_ADDRESS` to the values from your mail provider. Send a test rejection email before using the dashboard for candidates. The production example uses SMTP; a log or array mailer cannot deliver rejection emails.
 
+To store new CV uploads in S3, set `AWS_DEFAULT_REGION` and `AWS_BUCKET` in `.env.production`. Attach an IAM role with access to that private bucket to the EC2 instance; leave `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` unset. The app container must be able to reach EC2 instance metadata. With IMDSv2, a metadata response hop limit of 1 can block containers, so check the instance metadata settings if credentials cannot be found. Keep S3 Block Public Access enabled. Existing CVs on the local volume remain readable; keep backing up that volume until they are migrated. S3 storage and request charges apply.
+
 Do not change `APP_KEY` after user data exists because existing sessions and encrypted data may become unreadable. Keep a secure copy of `.env.production` and regularly back up the `postgres-data` and `cv-data` volumes. `.env.production` is excluded from Git and the Docker images. Existing MySQL data is not transferred automatically; preserve its volume until migration is verified.
 
 ## Start the stack
