@@ -30,6 +30,10 @@ After filling `.env.production`, deploy from the repository directory with one c
 
 Check `http://127.0.0.1:8181/up` and the home page. A Cloudflare Tunnel running on the same host can use **`http://127.0.0.1:8181`** as its origin service. The Tunnel uses local HTTP while visitors use the HTTPS hostname configured in `APP_URL`. Make sure the public hostname forwarded by the Tunnel matches the hostname in `APP_URL`.
 
+### Host Nginx reverse proxy (alternative to a direct Tunnel origin)
+
+If Nginx runs on the EC2 host, use [docker/nginx-host.example.conf](docker/nginx-host.example.conf) to proxy HTTPS requests to Docker's published `127.0.0.1:8181` port. Replace `career.hsb.co.id` with the hostname in `APP_URL` and set the certificate paths to an existing certificate for that hostname. Keep `APP_BIND_ADDRESS=127.0.0.1` and `APP_PORT=8181`. The file makes this site the host's default server and drops requests for any other hostname, so disable other default sites such as `/etc/nginx/sites-enabled/default`. Install the file as an enabled Nginx site, then run `sudo nginx -t` before reloading Nginx. The example redirects HTTP to HTTPS; obtain the certificate before enabling it. If Cloudflare Tunnel already points directly at `127.0.0.1:8181`, host Nginx is unnecessary.
+
 Verify the running app reports PHP 8.4.27 or newer: `docker compose --env-file .env.production -f compose.production.yaml exec app php -v`.
 
 Change the published port with `APP_PORT` in `.env.production`. The default `APP_BIND_ADDRESS=127.0.0.1` restricts origin access to the local host. If `cloudflared` runs in a container, attach it to the `hsb-jobs-production_frontend` Docker network and use `http://web:8181`. If the Tunnel runs on another host, set `APP_BIND_ADDRESS` to a reachable network address and restrict network access to that port.
